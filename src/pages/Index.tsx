@@ -48,7 +48,7 @@ const Index = () => {
             className="max-w-lg"
           >
             <div className="inline-flex items-center gap-1.5 bg-primary-foreground/15 backdrop-blur-sm rounded-full px-3 py-1 mb-4">
-              <Zap size={14} className="text-yellow-300" />
+              <Zap size={14} className="text-accent-foreground" />
               <span className="text-xs font-medium text-primary-foreground">{t('trustedStore')}</span>
             </div>
             <h1 className={`text-2xl md:text-4xl font-extrabold text-primary-foreground mb-3 leading-tight ${fontClass}`}>
