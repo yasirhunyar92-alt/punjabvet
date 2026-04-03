@@ -267,6 +267,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_order_contact: {
+        Args: {
+          _address: string
+          _customer_name: string
+          _order_id: string
+          _phone: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
