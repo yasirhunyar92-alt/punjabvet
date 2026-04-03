@@ -24,50 +24,56 @@ const ProductCard = ({ id, name, nameUr, price, imageUrl, inStock = true, featur
   const whatsappMsg = encodeURIComponent(`Hello, I want to order "${name}" from Punjab Veterinary Medical Store.`);
 
   return (
-    <div className="bg-card rounded-lg border card-elevated overflow-hidden flex flex-col">
+    <div className="bg-card rounded-lg border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
       <Link to={`/product/${id}`} className="block">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
-            <img src={imageUrl} alt={name} className="w-full h-full object-cover" loading="lazy" />
+            <img src={imageUrl} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-4xl">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-4xl bg-gradient-to-br from-muted to-accent/30">
               🐄
             </div>
           )}
           {featured && (
-            <Badge className="absolute top-2 left-2 text-[10px]">{t('featured')}</Badge>
+            <Badge className="absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-destructive hover:bg-destructive">
+              {t('featured')}
+            </Badge>
           )}
           {!inStock && (
-            <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
-              <span className={`text-primary-foreground font-semibold ${fontClass}`}>{t('outOfStock')}</span>
+            <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center backdrop-blur-[1px]">
+              <span className={`text-primary-foreground font-bold text-xs bg-destructive px-2 py-0.5 rounded ${fontClass}`}>{t('outOfStock')}</span>
             </div>
           )}
         </div>
       </Link>
 
-      <div className="p-3 flex flex-col flex-1">
+      <div className="p-2.5 flex flex-col flex-1">
         <Link to={`/product/${id}`}>
-          <h3 className={`text-sm font-medium text-foreground line-clamp-2 mb-1 ${fontClass}`}>
+          <h3 className={`text-xs font-medium text-foreground line-clamp-2 mb-1 leading-snug hover:text-primary transition-colors ${fontClass}`}>
             {displayName}
           </h3>
         </Link>
-        <p className="text-primary font-bold text-lg mt-auto">
-          {t('rs')} {price.toLocaleString()}
-        </p>
+        
+        <div className="mt-auto">
+          <p className="text-primary font-extrabold text-base">
+            <span className="text-[10px] font-normal text-muted-foreground">{t('rs')} </span>
+            {price.toLocaleString()}
+          </p>
+        </div>
 
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-1.5 mt-2">
           <Button
             size="sm"
-            className={`flex-1 text-xs ${fontClass}`}
+            className={`flex-1 text-[10px] h-7 font-semibold ${fontClass}`}
             onClick={() => addToCart(id)}
             disabled={!inStock}
           >
-            <ShoppingCart size={14} />
+            <ShoppingCart size={12} />
             {t('addToCart')}
           </Button>
           <a href={`https://wa.me/923065757283?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer">
-            <Button size="sm" variant="outline" className="whatsapp-green border-0 px-2">
-              <MessageCircle size={14} />
+            <Button size="sm" variant="outline" className="whatsapp-green border-0 px-2 h-7">
+              <MessageCircle size={12} />
             </Button>
           </a>
         </div>

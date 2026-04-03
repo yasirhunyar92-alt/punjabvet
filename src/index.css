@@ -126,4 +126,12 @@
   .whatsapp-green:hover {
     background-color: #20BD5A;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

@@ -27,6 +27,12 @@ export const translations = {
     featuredProducts: 'Featured Products',
     categories: 'Categories',
     bestSellers: 'Best Sellers',
+    trustedStore: 'Trusted Veterinary Store',
+    freeDelivery: 'Free Delivery',
+    genuineProducts: 'Genuine Products',
+    fastService: 'Fast Service',
+    whatsappOrder: 'Order via WhatsApp',
+    whatsappOrderDesc: 'Chat with us directly for quick orders and expert advice on veterinary products.',
 
     // Product
     addToCart: 'Add to Cart',
@@ -155,6 +161,12 @@ export const translations = {
     featuredProducts: 'نمایاں مصنوعات',
     categories: 'زمرے',
     bestSellers: 'سب سے زیادہ بکنے والی',
+    trustedStore: 'قابل اعتماد ویٹرنری اسٹور',
+    freeDelivery: 'مفت ڈلیوری',
+    genuineProducts: 'اصلی مصنوعات',
+    fastService: 'تیز سروس',
+    whatsappOrder: 'واٹس ایپ سے آرڈر کریں',
+    whatsappOrderDesc: 'جانوروں کی ادویات کے لیے براہ راست ہم سے بات کریں۔',
 
     addToCart: 'کارٹ میں شامل کریں',
     buyNow: 'ابھی خریدیں',
