@@ -27,6 +27,12 @@ export const translations = {
     featuredProducts: 'Featured Products',
     categories: 'Categories',
     bestSellers: 'Best Sellers',
+    trustedStore: 'Trusted Veterinary Store',
+    freeDelivery: 'Free Delivery',
+    genuineProducts: 'Genuine Products',
+    fastService: 'Fast Service',
+    whatsappOrder: 'Order via WhatsApp',
+    whatsappOrderDesc: 'Chat with us directly for quick orders and expert advice on veterinary products.',
 
     // Product
     addToCart: 'Add to Cart',
