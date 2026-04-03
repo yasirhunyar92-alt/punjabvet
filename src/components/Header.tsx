@@ -40,9 +40,14 @@ const Header = () => {
         </button>
 
         <Link to="/" className="flex-shrink-0">
-          <h1 className={`text-lg font-bold text-primary ${isUrdu ? 'font-urdu text-base' : ''}`}>
-            PVMS
-          </h1>
+          <div className="flex flex-col leading-tight">
+            <span className={`text-base font-extrabold tracking-tight text-primary ${isUrdu ? 'font-urdu text-sm' : ''}`}>
+              Punjab Veterinary
+            </span>
+            <span className={`text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground ${isUrdu ? 'font-urdu text-[9px] tracking-normal' : ''}`}>
+              Medical Store
+            </span>
+          </div>
         </Link>
 
         {/* Search */}
