@@ -123,6 +123,9 @@ const Header = () => {
         <nav className="lg:hidden bg-card border-t px-4 py-4 space-y-3 animate-slide-in">
           <Link to="/" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('home')}</Link>
           <Link to="/products" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('products')}</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('aboutUs')}</Link>
+          <Link to="/contact" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('contactUs')}</Link>
+          <Link to="/blog" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{isUrdu ? 'بلاگ' : 'Blog'}</Link>
           {user && <Link to="/profile" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('profile')}</Link>}
           {isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)} className={`block py-2 text-primary font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('admin')}</Link>}
           {user && (
@@ -139,6 +142,9 @@ const Header = () => {
           <Link to="/products?category=medicines" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('medicines')}</Link>
           <Link to="/products?category=vaccines" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('vaccines')}</Link>
           <Link to="/products?category=supplements" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('supplements')}</Link>
+          <Link to="/about" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('aboutUs')}</Link>
+          <Link to="/contact" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('contactUs')}</Link>
+          <Link to="/blog" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{isUrdu ? 'بلاگ' : 'Blog'}</Link>
           {isAdmin && <Link to="/admin" className={`text-sm font-medium text-primary hover:text-primary/80 transition-colors ml-auto ${isUrdu ? 'font-urdu' : ''}`}>{t('adminPanel')}</Link>}
         </div>
       </nav>
