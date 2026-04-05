@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, MessageCircle, ArrowLeft } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Badge } from '@/components/ui/badge';
+import SEOHead from '@/components/SEOHead';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -53,10 +54,41 @@ const ProductDetail = () => {
 
   const displayName = isUrdu && product.name_ur ? product.name_ur : product.name;
   const displayDesc = isUrdu && product.description_ur ? product.description_ur : product.description;
+  const categoryName = product.categories ? (isUrdu && (product.categories as any).name_ur ? (product.categories as any).name_ur : (product.categories as any).name) : '';
   const whatsappMsg = encodeURIComponent(`Hello, I want to order "${product.name}" (Rs. ${product.price}) from Punjab Veterinary Medical Store.`);
 
   return (
     <div className="container py-6">
+      <SEOHead
+        title={`${product.name} — Rs. ${product.price}`}
+        description={`Buy ${product.name} at Rs. ${product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || 'Quality veterinary product.'} ${product.name_ur || ''}`}
+        keywords={`${product.name}, ${categoryName}, veterinary medicine Sillanwali, Punjab Vet, buy ${product.name} Pakistan`}
+        image={product.image_url || undefined}
+        url={`/product/${product.id}`}
+        type="product"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: product.description || `${product.name} available at Punjab Veterinary Medical Store`,
+          image: product.image_url || undefined,
+          offers: {
+            '@type': 'Offer',
+            price: product.price,
+            priceCurrency: 'PKR',
+            availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            seller: {
+              '@type': 'Organization',
+              name: 'Punjab Veterinary Medical Store',
+            },
+          },
+          brand: {
+            '@type': 'Organization',
+            name: 'Punjab Veterinary Medical Store',
+          },
+        }}
+      />
+
       <Link to="/products" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground mb-4 text-sm">
         <ArrowLeft size={16} /> {t('products')}
       </Link>
@@ -65,7 +97,7 @@ const ProductDetail = () => {
         {/* Image */}
         <div className="aspect-square bg-muted rounded-lg overflow-hidden">
           {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.image_url} alt={`${product.name} — ${isUrdu ? 'پنجاب ویٹ سیلنوالی' : 'Punjab Vet Sillanwali'}`} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">🐄</div>
           )}
@@ -75,7 +107,7 @@ const ProductDetail = () => {
         <div>
           {product.categories && (
             <Badge variant="secondary" className={`mb-2 ${fontClass}`}>
-              {isUrdu && (product.categories as any).name_ur ? (product.categories as any).name_ur : (product.categories as any).name}
+              {categoryName}
             </Badge>
           )}
           <h1 className={`text-2xl font-bold text-foreground mb-2 ${fontClass}`}>{displayName}</h1>
