@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -46,8 +46,14 @@ const Auth = () => {
 
   return (
     <div className="container py-12 max-w-md">
-      <div className="bg-card border rounded-lg p-6">
-        <h1 className={`text-2xl font-bold text-center text-foreground mb-6 ${fontClass}`}>
+      <div className="bg-card border rounded-xl p-6 shadow-sm">
+        {/* Brand */}
+        <div className="text-center mb-6">
+          <h2 className="text-lg font-extrabold text-primary">Punjab Veterinary</h2>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">Medical Store</p>
+        </div>
+
+        <h1 className={`text-xl font-bold text-center text-foreground mb-6 ${fontClass}`}>
           {isForgot ? t('resetPassword') : isSignUp ? t('signUp') : t('signIn')}
         </h1>
 
@@ -100,10 +106,7 @@ const Auth = () => {
             </button>
           )}
           <div>
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setIsForgot(false); }}
-              className={`text-primary hover:underline ${fontClass}`}
-            >
+            <button onClick={() => { setIsSignUp(!isSignUp); setIsForgot(false); }} className={`text-primary hover:underline ${fontClass}`}>
               {isSignUp || isForgot ? t('haveAccount') : t('noAccount')}
             </button>
           </div>
