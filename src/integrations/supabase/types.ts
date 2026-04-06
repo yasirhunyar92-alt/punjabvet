@@ -156,46 +156,88 @@ export type Database = {
       }
       products: {
         Row: {
+          animal_type: string[] | null
+          batch_number: string | null
+          brand: string | null
           category_id: string | null
           created_at: string
           description: string | null
           description_ur: string | null
+          discount_price: number | null
+          expiry_date: string | null
           featured: boolean | null
           id: string
           image_url: string | null
+          images: string[] | null
           in_stock: boolean | null
           name: string
           name_ur: string | null
           price: number
+          rating: number | null
+          rating_count: number | null
+          sku: string | null
+          stock_quantity: number | null
+          tags: string[] | null
           updated_at: string
+          usage_instructions: string | null
+          usage_instructions_ur: string | null
+          volume_size: string | null
         }
         Insert: {
+          animal_type?: string[] | null
+          batch_number?: string | null
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
           description_ur?: string | null
+          discount_price?: number | null
+          expiry_date?: string | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           in_stock?: boolean | null
           name: string
           name_ur?: string | null
           price?: number
+          rating?: number | null
+          rating_count?: number | null
+          sku?: string | null
+          stock_quantity?: number | null
+          tags?: string[] | null
           updated_at?: string
+          usage_instructions?: string | null
+          usage_instructions_ur?: string | null
+          volume_size?: string | null
         }
         Update: {
+          animal_type?: string[] | null
+          batch_number?: string | null
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
           description_ur?: string | null
+          discount_price?: number | null
+          expiry_date?: string | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           in_stock?: boolean | null
           name?: string
           name_ur?: string | null
           price?: number
+          rating?: number | null
+          rating_count?: number | null
+          sku?: string | null
+          stock_quantity?: number | null
+          tags?: string[] | null
           updated_at?: string
+          usage_instructions?: string | null
+          usage_instructions_ur?: string | null
+          volume_size?: string | null
         }
         Relationships: [
           {
