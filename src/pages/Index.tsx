@@ -12,9 +12,7 @@ import vaccinesImg from '@/assets/vaccines-category.jpg';
 import supplementsImg from '@/assets/supplements-category.jpg';
 
 const categoryImages: Record<string, string> = {
-  medicines: medicinesImg,
-  vaccines: vaccinesImg,
-  supplements: supplementsImg,
+  medicines: medicinesImg, vaccines: vaccinesImg, supplements: supplementsImg,
 };
 
 const Index = () => {
@@ -23,26 +21,17 @@ const Index = () => {
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
-    queryFn: async () => {
-      const { data } = await supabase.from('categories').select('*');
-      return data || [];
-    },
+    queryFn: async () => { const { data } = await supabase.from('categories').select('*'); return data || []; },
   });
 
   const { data: featuredProducts } = useQuery({
     queryKey: ['featured-products'],
-    queryFn: async () => {
-      const { data } = await supabase.from('products').select('*').eq('featured', true).limit(8);
-      return data || [];
-    },
+    queryFn: async () => { const { data } = await supabase.from('products').select('*').eq('featured', true).limit(8); return data || []; },
   });
 
   const { data: allProducts } = useQuery({
     queryKey: ['all-products-home'],
-    queryFn: async () => {
-      const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false }).limit(12);
-      return data || [];
-    },
+    queryFn: async () => { const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false }).limit(12); return data || []; },
   });
 
   const testimonials = [
@@ -53,7 +42,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Hero Banner */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         <img src={heroBanner} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-96 object-cover" width={1920} height={800} />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent" />
@@ -71,20 +60,11 @@ const Index = () => {
                 {isUrdu ? 'معیاری ادویات، ویکسینز اور سپلیمنٹس — سیلنوالی سے آپ کی دہلیز تک' : 'Quality medicines, vaccines & supplements — from Sillanwali to your doorstep'}
               </p>
               <div className="flex gap-2">
-                <Link to="/products">
-                  <Button size="lg" variant="secondary" className={`font-bold shadow-lg text-sm ${f}`}>
-                    {isUrdu ? 'ابھی آرڈر کریں' : 'Order Now'} <ArrowRight size={16} />
-                  </Button>
-                </Link>
-                <Link to="/contact">
-                  <Button size="lg" variant="outline" className={`border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-sm ${f}`}>
-                    {t('contactUs')}
-                  </Button>
-                </Link>
+                <Link to="/products"><Button size="lg" variant="secondary" className={`font-bold shadow-lg text-sm ${f}`}>{isUrdu ? 'ابھی آرڈر کریں' : 'Order Now'} <ArrowRight size={16} /></Button></Link>
+                <Link to="/contact"><Button size="lg" variant="outline" className={`border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-sm ${f}`}>{t('contactUs')}</Button></Link>
               </div>
               <div className="mt-4 flex items-center gap-2 text-primary-foreground/80">
-                <Phone size={14} />
-                <span className="text-xs font-medium">0306-5757283</span>
+                <Phone size={14} /><span className="text-xs font-medium">0306-5757283</span>
               </div>
             </motion.div>
           </div>
@@ -109,11 +89,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Highlight */}
+      {/* Services */}
       <section className="container py-6">
-        <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>
-          {isUrdu ? 'ہماری خدمات' : 'Our Services'}
-        </h2>
+        <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہماری خدمات' : 'Our Services'}</h2>
         <div className="grid grid-cols-3 gap-3">
           {[
             { img: vaccinesImg, title: isUrdu ? 'ویکسینز' : 'Vaccines', alt: isUrdu ? 'سیلنوالی میں پنجاب ویٹ کی ویکسینز' : 'Veterinary vaccines at Punjab Vet Sillanwali' },
@@ -138,7 +116,6 @@ const Index = () => {
             { id: '1', name: 'Medicines', name_ur: 'ادویات', image_url: null },
             { id: '2', name: 'Vaccines', name_ur: 'ویکسین', image_url: null },
             { id: '3', name: 'Supplements', name_ur: 'جانوروں کی خوراک', image_url: null },
-            { id: '4', name: 'Dairy Products', name_ur: 'ڈیری مصنوعات', image_url: null },
           ]).map((cat) => (
             <Link key={cat.id} to={`/products?category=${cat.id}`} className="flex-shrink-0 w-20 md:w-24 group">
               <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-accent border-2 border-transparent group-hover:border-primary transition-colors flex items-center justify-center overflow-hidden">
@@ -166,13 +143,13 @@ const Index = () => {
                 <span className={`text-xs font-bold uppercase tracking-wider ${f}`}>{t('featuredProducts')}</span>
               </div>
             </div>
-            <Link to="/products?featured=true">
-              <Button variant="ghost" size="sm" className={`text-primary text-xs ${f}`}>{t('viewAll')} <ArrowRight size={12} /></Button>
-            </Link>
+            <Link to="/products"><Button variant="ghost" size="sm" className={`text-primary text-xs ${f}`}>{t('viewAll')} <ArrowRight size={12} /></Button></Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {featuredProducts.map(p => (
-              <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price} imageUrl={p.image_url} inStock={p.in_stock ?? true} featured={p.featured ?? false} />
+              <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
+                discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
+                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
             ))}
           </div>
         </section>
@@ -197,14 +174,14 @@ const Index = () => {
       <section className="container py-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className={`text-lg font-bold text-foreground ${f}`}>{t('allProducts')}</h2>
-          <Link to="/products">
-            <Button variant="ghost" size="sm" className={`text-primary text-xs ${f}`}>{t('viewAll')} <ArrowRight size={12} /></Button>
-          </Link>
+          <Link to="/products"><Button variant="ghost" size="sm" className={`text-primary text-xs ${f}`}>{t('viewAll')} <ArrowRight size={12} /></Button></Link>
         </div>
         {allProducts && allProducts.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {allProducts.map(p => (
-              <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price} imageUrl={p.image_url} inStock={p.in_stock ?? true} featured={p.featured ?? false} />
+              <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
+                discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
+                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
             ))}
           </div>
         ) : (
@@ -218,9 +195,7 @@ const Index = () => {
 
       {/* Testimonials */}
       <section className="container py-6 pb-10">
-        <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>
-          {isUrdu ? 'ہمارے گاہکوں کی رائے' : 'What Our Customers Say'}
-        </h2>
+        <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہمارے گاہکوں کی رائے' : 'What Our Customers Say'}</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {testimonials.map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
@@ -228,9 +203,7 @@ const Index = () => {
               <Quote size={20} className="text-primary/30 mb-2" />
               <p className={`text-sm text-muted-foreground italic mb-3 ${f}`}>"{item.text}"</p>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                  {item.name.charAt(0)}
-                </div>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">{item.name.charAt(0)}</div>
                 <div>
                   <p className={`text-sm font-semibold text-foreground ${f}`}>{item.name}</p>
                   <p className="text-[10px] text-muted-foreground">{item.location}</p>
