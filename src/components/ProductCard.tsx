@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, MessageCircle } from 'lucide-react';
+import { ShoppingCart, MessageCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
@@ -10,33 +10,38 @@ interface ProductCardProps {
   name: string;
   nameUr?: string | null;
   price: number;
+  discountPrice?: number | null;
   imageUrl?: string | null;
   inStock?: boolean;
   featured?: boolean;
+  tags?: string[] | null;
+  rating?: number | null;
+  ratingCount?: number | null;
 }
 
-const ProductCard = ({ id, name, nameUr, price, imageUrl, inStock = true, featured }: ProductCardProps) => {
+const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock = true, featured, tags, rating, ratingCount }: ProductCardProps) => {
   const { t, isUrdu } = useLanguage();
   const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const displayName = isUrdu && nameUr ? nameUr : name;
-
   const whatsappMsg = encodeURIComponent(`Hello, I want to order "${name}" from Punjab Veterinary Medical Store.`);
+  const hasDiscount = discountPrice && discountPrice < price;
 
   return (
-    <div className="bg-card rounded-lg border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+    <div className="bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
       <Link to={`/product/${id}`} className="block">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
             <img src={imageUrl} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-4xl bg-gradient-to-br from-muted to-accent/30">
-              🐄
-            </div>
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-4xl bg-gradient-to-br from-muted to-accent/30">🐄</div>
           )}
           {featured && (
-            <Badge className="absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-destructive hover:bg-destructive">
-              {t('featured')}
+            <Badge className="absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-destructive hover:bg-destructive">{t('featured')}</Badge>
+          )}
+          {hasDiscount && (
+            <Badge className="absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
+              -{Math.round(((price - discountPrice) / price) * 100)}%
             </Badge>
           )}
           {!inStock && (
@@ -53,28 +58,47 @@ const ProductCard = ({ id, name, nameUr, price, imageUrl, inStock = true, featur
             {displayName}
           </h3>
         </Link>
-        
+
+        {tags && tags.length > 0 && (
+          <div className="flex gap-1 flex-wrap mb-1">
+            {tags.slice(0, 2).map(tag => (
+              <span key={tag} className="text-[8px] bg-accent text-accent-foreground px-1 py-0 rounded">{tag}</span>
+            ))}
+          </div>
+        )}
+
+        {rating != null && rating > 0 && (
+          <div className="flex items-center gap-0.5 mb-1">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={10} className={i < Math.round(rating) ? 'fill-warning text-warning' : 'text-border'} />
+            ))}
+            {ratingCount != null && ratingCount > 0 && <span className="text-[9px] text-muted-foreground ml-0.5">({ratingCount})</span>}
+          </div>
+        )}
+
         <div className="mt-auto">
-          <p className="text-primary font-extrabold text-base">
-            <span className="text-[10px] font-normal text-muted-foreground">{t('rs')} </span>
-            {price.toLocaleString()}
-          </p>
+          {hasDiscount ? (
+            <div className="flex items-center gap-1.5">
+              <p className="text-primary font-extrabold text-base">
+                <span className="text-[10px] font-normal text-muted-foreground">{t('rs')} </span>
+                {discountPrice.toLocaleString()}
+              </p>
+              <p className="text-xs text-muted-foreground line-through">Rs. {price.toLocaleString()}</p>
+            </div>
+          ) : (
+            <p className="text-primary font-extrabold text-base">
+              <span className="text-[10px] font-normal text-muted-foreground">{t('rs')} </span>
+              {price.toLocaleString()}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-1.5 mt-2">
-          <Button
-            size="sm"
-            className={`flex-1 text-[10px] h-7 font-semibold ${fontClass}`}
-            onClick={() => addToCart(id)}
-            disabled={!inStock}
-          >
-            <ShoppingCart size={12} />
-            {t('addToCart')}
+          <Button size="sm" className={`flex-1 text-[10px] h-7 font-semibold ${fontClass}`} onClick={() => addToCart(id)} disabled={!inStock}>
+            <ShoppingCart size={12} /> {t('addToCart')}
           </Button>
           <a href={`https://wa.me/923065757283?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer">
-            <Button size="sm" variant="outline" className="whatsapp-green border-0 px-2 h-7">
-              <MessageCircle size={12} />
-            </Button>
+            <Button size="sm" variant="outline" className="whatsapp-green border-0 px-2 h-7"><MessageCircle size={12} /></Button>
           </a>
         </div>
       </div>
