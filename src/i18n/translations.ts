@@ -79,6 +79,11 @@ export const translations = {
     placeOrder: 'Place Order',
     orderSuccess: 'Order placed successfully!',
     orderConfirmation: 'Your order has been placed. We will contact you soon.',
+    city: 'City',
+    deliveryCharges: 'TCS Delivery Charges',
+    grandTotal: 'Grand Total',
+    cashOnDelivery: 'Cash on Delivery',
+    codMessage: 'Pay cash when your order is delivered',
 
     // Auth
     signIn: 'Sign In',
@@ -228,6 +233,11 @@ export const translations = {
     placeOrder: 'آرڈر دیں',
     orderSuccess: 'آرڈر کامیابی سے دے دیا گیا!',
     orderConfirmation: 'آپ کا آرڈر مل گیا ہے۔ ہم جلد آپ سے رابطہ کریں گے۔',
+    city: 'شہر',
+    deliveryCharges: 'TCS ڈیلیوری چارجز',
+    grandTotal: 'کل رقم',
+    cashOnDelivery: 'کیش آن ڈیلیوری',
+    codMessage: 'آرڈر ملنے پر نقد ادائیگی کریں',
 
     signIn: 'سائن ان',
     signUp: 'سائن اپ',
