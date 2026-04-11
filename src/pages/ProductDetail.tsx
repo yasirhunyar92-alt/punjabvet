@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, MessageCircle, Star, ChevronRight } from 'lucide-react';
+import { ShoppingCart, MessageCircle, Star, ChevronRight, Zap } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { Badge } from '@/components/ui/badge';
 import SEOHead from '@/components/SEOHead';
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { t, isUrdu } = useLanguage();
   const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
@@ -34,6 +35,12 @@ const ProductDetail = () => {
     },
     enabled: !!product?.category_id,
   });
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+    await addToCart(product.id);
+    navigate('/checkout');
+  };
 
   if (isLoading) return (
     <div className="container py-8">
@@ -174,6 +181,7 @@ const ProductDetail = () => {
             {product.batch_number && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('batchNumber')}</span><span className="font-medium">{product.batch_number}</span></div>}
           </div>
 
+          {/* Description - Benefits */}
           {displayDesc && (
             <div className="mt-6">
               <h3 className={`font-semibold text-foreground mb-2 ${fontClass}`}>{t('description')}</h3>
@@ -181,6 +189,7 @@ const ProductDetail = () => {
             </div>
           )}
 
+          {/* Usage Instructions */}
           {usageText && (
             <div className="mt-4">
               <h3 className={`font-semibold text-foreground mb-2 ${fontClass}`}>{t('usageInstructions')}</h3>
@@ -188,8 +197,12 @@ const ProductDetail = () => {
             </div>
           )}
 
+          {/* Action Buttons: Buy Now + Add to Cart */}
           <div className="flex flex-col gap-3 mt-8">
-            <Button size="lg" onClick={() => addToCart(product.id)} disabled={!product.in_stock} className={fontClass}>
+            <Button size="lg" onClick={handleBuyNow} disabled={!product.in_stock} className={`bg-accent-foreground hover:bg-accent-foreground/90 ${fontClass}`}>
+              <Zap size={18} /> {t('buyNow')}
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => addToCart(product.id)} disabled={!product.in_stock} className={fontClass}>
               <ShoppingCart size={18} /> {t('addToCart')}
             </Button>
             <a href={`https://wa.me/923065757283?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer">
