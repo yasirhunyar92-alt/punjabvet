@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const { t, language, setLanguage, isUrdu } = useLanguage();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, signOut, loading: authLoading } = useAuth();
   const { totalItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,16 +24,20 @@ const Header = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    setMenuOpen(false);
+    navigate('/');
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
-      {/* Top bar */}
       <div className="hero-gradient px-4 py-1.5 text-center">
         <p className={`text-xs text-primary-foreground ${isUrdu ? 'font-urdu' : ''}`}>
           {t('storeName')} — {t('location')}
         </p>
       </div>
 
-      {/* Main header */}
       <div className="container flex items-center gap-3 py-3">
         <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-foreground">
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -50,7 +54,6 @@ const Header = () => {
           </div>
         </Link>
 
-        {/* Search */}
         <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-auto hidden sm:flex">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
@@ -64,7 +67,6 @@ const Header = () => {
         </form>
 
         <div className="flex items-center gap-2 ml-auto">
-          {/* Language toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -74,7 +76,6 @@ const Header = () => {
             <Globe size={20} />
           </Button>
 
-          {/* Cart */}
           <Link to="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingCart size={22} />
@@ -86,8 +87,9 @@ const Header = () => {
             </Button>
           </Link>
 
-          {/* User */}
-          {user ? (
+          {authLoading ? (
+            <div className="h-9 w-16 rounded-md bg-muted animate-pulse" />
+          ) : user ? (
             <Link to="/profile">
               <Button variant="ghost" size="icon">
                 <User size={22} />
@@ -103,7 +105,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile search */}
       <div className="sm:hidden px-4 pb-3">
         <form onSubmit={handleSearch}>
           <div className="relative">
@@ -118,7 +119,6 @@ const Header = () => {
         </form>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <nav className="lg:hidden bg-card border-t px-4 py-4 space-y-3 animate-slide-in">
           <Link to="/" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('home')}</Link>
@@ -126,15 +126,14 @@ const Header = () => {
           <Link to="/about" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('aboutUs')}</Link>
           <Link to="/contact" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('contactUs')}</Link>
           <Link to="/blog" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{isUrdu ? 'بلاگ' : 'Blog'}</Link>
-          {user && <Link to="/profile" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('profile')}</Link>}
-          {isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)} className={`block py-2 text-primary font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('admin')}</Link>}
-          {user && (
-            <button onClick={() => { signOut(); setMenuOpen(false); }} className={`block py-2 text-destructive font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('logout')}</button>
+          {!authLoading && user && <Link to="/profile" onClick={() => setMenuOpen(false)} className={`block py-2 text-foreground font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('profile')}</Link>}
+          {!authLoading && isAdmin && <Link to="/admin" onClick={() => setMenuOpen(false)} className={`block py-2 text-primary font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('admin')}</Link>}
+          {!authLoading && user && (
+            <button onClick={() => void handleSignOut()} className={`block py-2 text-destructive font-medium ${isUrdu ? 'font-urdu' : ''}`}>{t('logout')}</button>
           )}
         </nav>
       )}
 
-      {/* Desktop nav */}
       <nav className="hidden lg:block bg-secondary/50 border-t">
         <div className="container flex items-center gap-6 py-2">
           <Link to="/" className={`text-sm font-medium text-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('home')}</Link>
@@ -145,7 +144,7 @@ const Header = () => {
           <Link to="/about" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('aboutUs')}</Link>
           <Link to="/contact" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{t('contactUs')}</Link>
           <Link to="/blog" className={`text-sm font-medium text-muted-foreground hover:text-primary transition-colors ${isUrdu ? 'font-urdu' : ''}`}>{isUrdu ? 'بلاگ' : 'Blog'}</Link>
-          {isAdmin && <Link to="/admin" className={`text-sm font-medium text-primary hover:text-primary/80 transition-colors ml-auto ${isUrdu ? 'font-urdu' : ''}`}>{t('adminPanel')}</Link>}
+          {!authLoading && isAdmin && <Link to="/admin" className={`text-sm font-medium text-primary hover:text-primary/80 transition-colors ml-auto ${isUrdu ? 'font-urdu' : ''}`}>{t('adminPanel')}</Link>}
         </div>
       </nav>
     </header>

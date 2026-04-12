@@ -14,18 +14,24 @@ import { LogOut, User as UserIcon, Package, MapPin } from 'lucide-react';
 
 const Profile = () => {
   const { t, isUrdu } = useLanguage();
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [profileForm, setProfileForm] = useState({ name: '', phone: '', address: '' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user) { navigate('/auth'); return; }
-    supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
+    if (authLoading) return;
+
+    if (!user) {
+      navigate('/auth', { replace: true });
+      return;
+    }
+
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle().then(({ data }) => {
       if (data) setProfileForm({ name: data.name || '', phone: data.phone || '', address: data.address || '' });
     });
-  }, [user]);
+  }, [user, authLoading, navigate]);
 
   const { data: orders } = useQuery({
     queryKey: ['my-orders', user?.id],
@@ -37,7 +43,7 @@ const Profile = () => {
         .order('created_at', { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !authLoading && !!user,
   });
 
   const saveProfile = async () => {
@@ -53,12 +59,21 @@ const Profile = () => {
     setSaving(false);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   const statusColors: Record<string, string> = {
     pending: 'bg-warning text-foreground',
     processing: 'bg-primary/20 text-primary',
     completed: 'bg-accent text-accent-foreground',
     cancelled: 'bg-destructive/20 text-destructive',
   };
+
+  if (authLoading) {
+    return <div className="container py-16 text-center text-muted-foreground">{t('loading')}</div>;
+  }
 
   if (!user) return null;
 
@@ -72,7 +87,7 @@ const Profile = () => {
               {t('admin')}
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => { signOut(); navigate('/'); }}>
+          <Button variant="outline" size="sm" onClick={() => void handleSignOut()}>
             <LogOut size={16} /> {t('logout')}
           </Button>
         </div>

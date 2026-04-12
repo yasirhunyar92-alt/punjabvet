@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
@@ -23,39 +23,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdminRole = async (userId: string) => {
-    const { data } = await supabase
+  const checkAdminRole = useCallback(async (userId: string) => {
+    const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
       .eq('role', 'admin')
       .maybeSingle();
+
+    if (error) {
+      setIsAdmin(false);
+      return;
+    }
+
     setIsAdmin(!!data);
-  };
+  }, []);
+
+  const applySession = useCallback((nextSession: Session | null) => {
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+
+    if (nextSession?.user) {
+      void checkAdminRole(nextSession.user.id);
+      return;
+    }
+
+    setIsAdmin(false);
+  }, [checkAdminRole]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setTimeout(() => checkAdminRole(session.user.id), 0);
-      } else {
-        setIsAdmin(false);
+    let active = true;
+
+    const initializeAuth = async () => {
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+
+        if (!active) return;
+
+        if (currentSession || attempt === 4) {
+          applySession(currentSession);
+          setLoading(false);
+          return;
+        }
+
+        await new Promise(resolve => window.setTimeout(resolve, 250));
       }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!active) return;
+      applySession(nextSession);
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdminRole(session.user.id);
-      }
-      setLoading(false);
-    });
+    void initializeAuth();
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [applySession]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { error } = await supabase.auth.signUp({
@@ -75,8 +102,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const result = await lovable.auth.signInWithOAuth('google', {
       redirect_uri: window.location.origin,
     });
+
     if ('error' in result && result.error) throw result.error;
     if ('redirected' in result && result.redirected) return;
+
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
+    applySession(currentSession);
   };
 
   const signOut = async () => {
