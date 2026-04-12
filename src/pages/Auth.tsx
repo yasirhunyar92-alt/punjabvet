@@ -17,7 +17,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', name: '' });
 
-  if (user) { navigate('/'); return null; }
+  if (user) { navigate('/', { replace: true }); return null; }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
