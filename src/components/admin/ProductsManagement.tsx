@@ -42,6 +42,70 @@ const ProductsManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [form, setForm] = useState<ProductForm>({ ...emptyForm });
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const handleAiGenerate = async (imageUrl: string) => {
+    if (!imageUrl) { toast.error('Upload an image first'); return; }
+    setAiLoading(true);
+    const toastId = toast.loading('AI is analyzing your product...');
+    try {
+      // Step 1: Analyze image and auto-fill form
+      const { data: analyzeData, error: analyzeErr } = await supabase.functions.invoke('ai-product-analyze', {
+        body: { imageUrl, action: 'analyze' },
+      });
+      if (analyzeErr) throw analyzeErr;
+      if (analyzeData?.error) throw new Error(analyzeData.error);
+
+      const info = analyzeData?.productInfo;
+      if (info) {
+        setForm(prev => ({
+          ...prev,
+          name: info.name || prev.name,
+          name_ur: info.name_ur || prev.name_ur,
+          description: info.description || prev.description,
+          description_ur: info.description_ur || prev.description_ur,
+          price: info.price ? String(info.price) : prev.price,
+          brand: info.brand || prev.brand,
+          volume_size: info.volume_size || prev.volume_size,
+          tags: info.tags?.length ? info.tags : prev.tags,
+          animal_type: info.animal_type?.length ? info.animal_type.filter((a: string) => ANIMAL_TYPES.includes(a)) : prev.animal_type,
+          usage_instructions: info.usage_instructions || prev.usage_instructions,
+          usage_instructions_ur: info.usage_instructions_ur || prev.usage_instructions_ur,
+          batch_number: info.batch_number || prev.batch_number,
+          expiry_date: info.expiry_date || prev.expiry_date,
+        }));
+        setMoreOpen(true);
+      }
+
+      // Step 2: Enhance main image (remove bg)
+      toast.loading('Enhancing image with AI...', { id: toastId });
+      const { data: enhData, error: enhErr } = await supabase.functions.invoke('ai-product-analyze', {
+        body: { imageUrl, action: 'remove-bg' },
+      });
+
+      if (!enhErr && enhData?.editedImage) {
+        const base64 = enhData.editedImage.replace(/^data:image\/\w+;base64,/, '');
+        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        const fileName = `products/ai-${Date.now()}.png`;
+        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png' });
+        if (!uploadErr) {
+          const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+          const newUrl = urlData.publicUrl;
+          setForm(prev => {
+            const updatedImages = prev.images.map(img => img === imageUrl ? newUrl : img);
+            if (!updatedImages.includes(newUrl)) updatedImages.push(newUrl);
+            return { ...prev, image_url: newUrl, images: updatedImages };
+          });
+        }
+      }
+
+      toast.success('AI filled the form & enhanced image!', { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || 'AI generation failed', { id: toastId });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const { data: products } = useQuery({
     queryKey: ['admin-products'],
