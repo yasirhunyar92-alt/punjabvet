@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, X, Loader2, Plus } from 'lucide-react';
+import { Upload, X, Loader2, Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,10 +10,12 @@ interface MultiImageUploadProps {
   images: string[];
   onMainImageChange: (url: string) => void;
   onImagesChange: (urls: string[]) => void;
+  onAiGenerate?: (imageUrl: string) => void;
 }
 
-const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange }: MultiImageUploadProps) => {
+const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange, onAiGenerate }: MultiImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
+  const [enhancing, setEnhancing] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +63,45 @@ const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange
 
   const setAsMain = (url: string) => onMainImageChange(url);
 
+  const handleEnhance = async (index: number) => {
+    const url = images[index];
+    setEnhancing(index);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-product-analyze', {
+        body: { imageUrl: url, action: 'remove-bg' },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.editedImage) {
+        // Upload the enhanced image to storage
+        const base64 = data.editedImage.replace(/^data:image\/\w+;base64,/, '');
+        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        const fileName = `products/ai-${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
+
+        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png' });
+        if (uploadErr) throw uploadErr;
+
+        const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        const newUrl = urlData.publicUrl;
+
+        // Replace the old image with enhanced one
+        const updated = [...images];
+        updated[index] = newUrl;
+        onImagesChange(updated);
+        if (url === mainImage) onMainImageChange(newUrl);
+        toast.success('Image enhanced with AI!');
+      } else {
+        toast.error('AI could not process the image');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Enhancement failed');
+    } finally {
+      setEnhancing(null);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <Label>Product Images</Label>
@@ -71,6 +112,11 @@ const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange
             <button type="button" onClick={() => removeImage(i)} className="absolute top-0.5 right-0.5 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               <X size={10} />
             </button>
+            {/* AI Enhance button */}
+            <button type="button" onClick={() => handleEnhance(i)} disabled={enhancing === i}
+              className="absolute bottom-0.5 left-0.5 bg-primary text-primary-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50">
+              {enhancing === i ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+            </button>
             {url === mainImage && <span className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground text-[8px] text-center py-0.5">Main</span>}
           </div>
         ))}
@@ -80,7 +126,13 @@ const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange
           {uploading ? <Loader2 size={16} className="animate-spin" /> : <><Plus size={16} /><span className="text-[9px] mt-0.5">Add</span></>}
         </button>
       </div>
-      <p className="text-[10px] text-muted-foreground">Click an image to set as main. Max 5MB each.</p>
+      {/* AI Generate button */}
+      {images.length > 0 && onAiGenerate && (
+        <Button type="button" variant="outline" size="sm" className="w-full gap-1.5 text-primary border-primary/30 hover:bg-primary/10" onClick={() => onAiGenerate(mainImage || images[0])}>
+          <Sparkles size={14} /> AI Generate — Auto-fill form & enhance image
+        </Button>
+      )}
+      <p className="text-[10px] text-muted-foreground">Click image to set as main. Hover for ✨ to remove BG. Max 5MB each.</p>
     </div>
   );
 };
