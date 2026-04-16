@@ -282,9 +282,15 @@ const ProductsManagement = () => {
             </div>
 
             {/* Images */}
+            {aiLoading && (
+              <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg text-sm text-primary">
+                <Loader2 size={16} className="animate-spin" /> AI is working... please wait
+              </div>
+            )}
             <MultiImageUpload mainImage={form.image_url} images={form.images}
               onMainImageChange={url => f('image_url', url)}
-              onImagesChange={urls => f('images', urls)} />
+              onImagesChange={urls => f('images', urls)}
+              onAiGenerate={handleAiGenerate} />
 
             {/* Toggles */}
             <div className="flex items-center gap-6">
