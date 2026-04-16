@@ -94,6 +94,11 @@ export const translations = {
     forgotPassword: 'Forgot Password?',
     resetPassword: 'Reset Password',
     continueWithGoogle: 'Continue with Google',
+    mobileNumber: 'Mobile Number',
+    sendCode: 'Send Verification Code',
+    verifyLogin: 'Verify & Login',
+    resendCode: 'Resend code',
+    loginWithMobile: 'Login with Mobile',
     noAccount: "Don't have an account?",
     haveAccount: 'Already have an account?',
 
@@ -247,6 +252,11 @@ export const translations = {
     forgotPassword: 'پاس ورڈ بھول گئے؟',
     resetPassword: 'پاس ورڈ ری سیٹ',
     continueWithGoogle: 'گوگل سے جاری رکھیں',
+    mobileNumber: 'موبائل نمبر',
+    sendCode: 'تصدیقی کوڈ بھیجیں',
+    verifyLogin: 'تصدیق کریں',
+    resendCode: 'دوبارہ کوڈ بھیجیں',
+    loginWithMobile: 'موبائل سے لاگ ان',
     noAccount: 'اکاؤنٹ نہیں ہے؟',
     haveAccount: 'پہلے سے اکاؤنٹ ہے؟',
 
