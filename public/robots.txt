@@ -1,4 +1,9 @@
 User-agent: *
-Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /profile/
+Disallow: /reset-password/
 
-Sitemap: https://punjabvet.lovable.app/sitemap.xml
+Sitemap: https://punjabveterinary.com/sitemap.xml
