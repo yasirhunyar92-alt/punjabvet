@@ -10,6 +10,7 @@ import heroBanner from '@/assets/hero-banner.jpg';
 import medicinesImg from '@/assets/medicines-category.jpg';
 import vaccinesImg from '@/assets/vaccines-category.jpg';
 import supplementsImg from '@/assets/supplements-category.jpg';
+import PromoBanners from '@/components/PromoBanners';
 
 const categoryImages: Record<string, string> = {
   medicines: medicinesImg, vaccines: vaccinesImg, supplements: supplementsImg,
@@ -70,6 +71,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <PromoBanners />
 
       {/* Trust Badges */}
       <section className="bg-card border-b">

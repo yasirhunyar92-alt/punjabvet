@@ -11,8 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp } from 'lucide-react';
+import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
+import CouponsManagement from '@/components/admin/CouponsManagement';
+import BannersManagement from '@/components/admin/BannersManagement';
 
 const Admin = () => {
   const { t, isUrdu } = useLanguage();
@@ -35,16 +37,20 @@ const Admin = () => {
 
       <Tabs defaultValue="products">
         <TabsList className="w-full mb-6 flex-wrap h-auto gap-1">
-          <TabsTrigger value="analytics" className={`flex-1 ${fontClass}`}><TrendingUp size={16} className="mr-1" /> {t('analytics')}</TabsTrigger>
-          <TabsTrigger value="products" className={`flex-1 ${fontClass}`}><Package size={16} className="mr-1" /> {t('manageProducts')}</TabsTrigger>
-          <TabsTrigger value="orders" className={`flex-1 ${fontClass}`}><ShoppingCart size={16} className="mr-1" /> {t('manageOrders')}</TabsTrigger>
-          <TabsTrigger value="categories" className={`flex-1 ${fontClass}`}>{t('manageCategories')}</TabsTrigger>
+          <TabsTrigger value="analytics" className={fontClass}><TrendingUp size={14} className="mr-1" /> {t('analytics')}</TabsTrigger>
+          <TabsTrigger value="products" className={fontClass}><Package size={14} className="mr-1" /> {t('manageProducts')}</TabsTrigger>
+          <TabsTrigger value="orders" className={fontClass}><ShoppingCart size={14} className="mr-1" /> {t('manageOrders')}</TabsTrigger>
+          <TabsTrigger value="categories" className={fontClass}>{t('manageCategories')}</TabsTrigger>
+          <TabsTrigger value="coupons" className={fontClass}><Tag size={14} className="mr-1" /> Coupons</TabsTrigger>
+          <TabsTrigger value="banners" className={fontClass}><ImageIcon size={14} className="mr-1" /> Banners</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
         <TabsContent value="products"><ProductsManagement /></TabsContent>
         <TabsContent value="orders"><OrdersManagement /></TabsContent>
         <TabsContent value="categories"><CategoriesManagement /></TabsContent>
+        <TabsContent value="coupons"><CouponsManagement /></TabsContent>
+        <TabsContent value="banners"><BannersManagement /></TabsContent>
       </Tabs>
     </div>
   );
