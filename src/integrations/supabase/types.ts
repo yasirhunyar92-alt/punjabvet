@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      banners: {
+        Row: {
+          active: boolean
+          banner_type: string
+          countdown_to: string | null
+          created_at: string
+          cta_text: string | null
+          id: string
+          image_url: string | null
+          link_url: string | null
+          sort_order: number
+          subtitle: string | null
+          subtitle_ur: string | null
+          title: string
+          title_ur: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          banner_type?: string
+          countdown_to?: string | null
+          created_at?: string
+          cta_text?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          subtitle_ur?: string | null
+          title: string
+          title_ur?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          banner_type?: string
+          countdown_to?: string | null
+          created_at?: string
+          cta_text?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          subtitle_ur?: string | null
+          title?: string
+          title_ur?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          ai_generated: boolean
+          author_id: string | null
+          category: string | null
+          content: string
+          content_ur: string | null
+          cover_image: string | null
+          created_at: string
+          excerpt: string | null
+          excerpt_ur: string | null
+          id: string
+          published: boolean
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          tags: string[] | null
+          title: string
+          title_ur: string | null
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          ai_generated?: boolean
+          author_id?: string | null
+          category?: string | null
+          content: string
+          content_ur?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          excerpt_ur?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          title_ur?: string | null
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          ai_generated?: boolean
+          author_id?: string | null
+          category?: string | null
+          content?: string
+          content_ur?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          excerpt_ur?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          title_ur?: string | null
+          updated_at?: string
+          views?: number
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -70,6 +190,110 @@ export type Database = {
           image_url?: string | null
           name?: string
           name_ur?: string | null
+        }
+        Relationships: []
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          min_order_amount: number | null
+          starts_at: string | null
+          updated_at: string
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          updated_at?: string
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          updated_at?: string
+          used_count?: number
+        }
+        Relationships: []
+      }
+      loyalty_points: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string | null
+          points: number
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          points: number
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          points?: number
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_points_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          active: boolean
+          email: string
+          id: string
+          subscribed_at: string
+        }
+        Insert: {
+          active?: boolean
+          email: string
+          id?: string
+          subscribed_at?: string
+        }
+        Update: {
+          active?: boolean
+          email?: string
+          id?: string
+          subscribed_at?: string
         }
         Relationships: []
       }
@@ -154,6 +378,50 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          approved: boolean
+          comment: string | null
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          rating: number
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved?: boolean
+          comment?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           animal_type: string[] | null
@@ -165,6 +433,7 @@ export type Database = {
           description_ur: string | null
           discount_price: number | null
           expiry_date: string | null
+          faqs: Json | null
           featured: boolean | null
           id: string
           image_url: string | null
@@ -175,7 +444,10 @@ export type Database = {
           price: number
           rating: number | null
           rating_count: number | null
+          seo_description: string | null
+          seo_title: string | null
           sku: string | null
+          slug: string | null
           stock_quantity: number | null
           tags: string[] | null
           updated_at: string
@@ -193,6 +465,7 @@ export type Database = {
           description_ur?: string | null
           discount_price?: number | null
           expiry_date?: string | null
+          faqs?: Json | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
@@ -203,7 +476,10 @@ export type Database = {
           price?: number
           rating?: number | null
           rating_count?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
           sku?: string | null
+          slug?: string | null
           stock_quantity?: number | null
           tags?: string[] | null
           updated_at?: string
@@ -221,6 +497,7 @@ export type Database = {
           description_ur?: string | null
           discount_price?: number | null
           expiry_date?: string | null
+          faqs?: Json | null
           featured?: boolean | null
           id?: string
           image_url?: string | null
@@ -231,7 +508,10 @@ export type Database = {
           price?: number
           rating?: number | null
           rating_count?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
           sku?: string | null
+          slug?: string | null
           stock_quantity?: number | null
           tags?: string[] | null
           updated_at?: string
@@ -257,6 +537,8 @@ export type Database = {
           id: string
           name: string | null
           phone: string | null
+          referral_code: string | null
+          referred_by: string | null
           updated_at: string
         }
         Insert: {
@@ -266,6 +548,8 @@ export type Database = {
           id: string
           name?: string | null
           phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -275,6 +559,8 @@ export type Database = {
           id?: string
           name?: string | null
           phone?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -296,6 +582,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlists_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
