@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Truck, Banknote, MessageCircle } from 'lucide-react';
+import { Truck, Banknote, MessageCircle, Tag, X } from 'lucide-react';
 
 const TCS_CHARGES = 250;
 
@@ -20,7 +20,32 @@ const Checkout = () => {
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', address: '', city: '' });
-  const grandTotal = totalPrice + TCS_CHARGES;
+  const [couponInput, setCouponInput] = useState('');
+  const [coupon, setCoupon] = useState<{ id: string; code: string; discount: number } | null>(null);
+  const [applying, setApplying] = useState(false);
+  const subtotal = totalPrice;
+  const discount = coupon?.discount || 0;
+  const grandTotal = Math.max(0, subtotal - discount) + TCS_CHARGES;
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setApplying(true);
+    try {
+      const { data, error } = await supabase.from('coupons').select('*').eq('code', code).eq('active', true).maybeSingle();
+      if (error || !data) { toast.error(isUrdu ? 'غلط کوپن' : 'Invalid coupon'); return; }
+      if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error(isUrdu ? 'کوپن ختم ہو چکا' : 'Coupon expired'); return; }
+      if (data.max_uses && data.used_count >= data.max_uses) { toast.error(isUrdu ? 'کوپن استعمال ہو چکا' : 'Coupon limit reached'); return; }
+      if (data.min_order_amount && subtotal < Number(data.min_order_amount)) {
+        toast.error(`${isUrdu ? 'کم از کم آرڈر' : 'Min order'}: Rs. ${data.min_order_amount}`); return;
+      }
+      const d = data.discount_type === 'percent'
+        ? Math.round(subtotal * Number(data.discount_value) / 100)
+        : Number(data.discount_value);
+      setCoupon({ id: data.id, code: data.code, discount: Math.min(d, subtotal) });
+      toast.success(isUrdu ? 'کوپن لاگو ہو گیا' : 'Coupon applied');
+    } finally { setApplying(false); }
+  };
 
   const buildWhatsAppMessage = () => {
     const itemsList = items.map(item =>
@@ -30,7 +55,8 @@ const Checkout = () => {
     return encodeURIComponent(
       `🛒 *New Order – Punjab Vet*\n\n` +
       `${itemsList}\n\n` +
-      `Product Total: Rs. ${totalPrice.toLocaleString()}\n` +
+      `Product Total: Rs. ${subtotal.toLocaleString()}\n` +
+      (coupon ? `Coupon (${coupon.code}): -Rs. ${discount.toLocaleString()}\n` : '') +
       `TCS Delivery: Rs. ${TCS_CHARGES}\n` +
       `*Grand Total: Rs. ${grandTotal.toLocaleString()}*\n\n` +
       `👤 Name: ${form.name}\n` +
