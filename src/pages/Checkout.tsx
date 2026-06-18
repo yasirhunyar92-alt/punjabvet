@@ -105,9 +105,8 @@ const Checkout = () => {
       if (itemsError) throw itemsError;
 
       if (coupon) {
-        // best-effort increment; ignore failure
-        await supabase.rpc as any;
-        await supabase.from('coupons').update({ used_count: (await supabase.from('coupons').select('used_count').eq('id', coupon.id).single()).data?.used_count + 1 || 1 }).eq('id', coupon.id);
+        const { data: cur } = await supabase.from('coupons').select('used_count').eq('id', coupon.id).single();
+        await supabase.from('coupons').update({ used_count: (cur?.used_count || 0) + 1 }).eq('id', coupon.id);
       }
 
       await clearCart();
