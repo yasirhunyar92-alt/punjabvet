@@ -104,6 +104,12 @@ const Checkout = () => {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
 
+      if (coupon) {
+        // best-effort increment; ignore failure
+        await supabase.rpc as any;
+        await supabase.from('coupons').update({ used_count: (await supabase.from('coupons').select('used_count').eq('id', coupon.id).single()).data?.used_count + 1 || 1 }).eq('id', coupon.id);
+      }
+
       await clearCart();
       toast.success(t('orderSuccess'));
 
@@ -140,8 +146,14 @@ const Checkout = () => {
         <div className="border-t mt-3 pt-3 space-y-2 text-sm">
           <div className="flex justify-between">
             <span className={`text-muted-foreground ${fontClass}`}>{isUrdu ? 'مصنوعات کی قیمت' : 'Product Total'}</span>
-            <span>{t('rs')} {totalPrice.toLocaleString()}</span>
+            <span>{t('rs')} {subtotal.toLocaleString()}</span>
           </div>
+          {coupon && (
+            <div className="flex justify-between text-primary">
+              <span className="flex items-center gap-1"><Tag size={14} /> {coupon.code}</span>
+              <span>− {t('rs')} {discount.toLocaleString()}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-muted-foreground flex items-center gap-1">
               <Truck size={14} /> {isUrdu ? 'TCS ڈیلیوری چارجز' : 'TCS Delivery Charges'}
@@ -153,6 +165,26 @@ const Checkout = () => {
             <span className="text-primary">{t('rs')} {grandTotal.toLocaleString()}</span>
           </div>
         </div>
+      </div>
+
+      {/* Coupon */}
+      <div className="bg-card border rounded-lg p-4 mb-6">
+        <Label className={`flex items-center gap-1 mb-2 ${fontClass}`}><Tag size={14} /> {isUrdu ? 'پروموشن کوڈ' : 'Promo Code'}</Label>
+        {coupon ? (
+          <div className="flex items-center justify-between bg-primary/10 rounded-md px-3 py-2">
+            <span className="font-mono font-bold text-primary">{coupon.code}</span>
+            <Button type="button" size="sm" variant="ghost" onClick={() => { setCoupon(null); setCouponInput(''); }}>
+              <X size={14} />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Input value={couponInput} onChange={e => setCouponInput(e.target.value)} placeholder={isUrdu ? 'کوڈ درج کریں' : 'Enter code'} className="uppercase" />
+            <Button type="button" variant="outline" onClick={applyCoupon} disabled={applying}>
+              {applying ? '...' : (isUrdu ? 'لاگو کریں' : 'Apply')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* COD Info */}
