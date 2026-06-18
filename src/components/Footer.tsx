@@ -35,6 +35,8 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li><Link to="/privacy" className={`opacity-90 hover:opacity-100 ${f}`}>{isUrdu ? 'رازداری کی پالیسی' : 'Privacy Policy'}</Link></li>
               <li><Link to="/terms" className={`opacity-90 hover:opacity-100 ${f}`}>{isUrdu ? 'شرائط و ضوابط' : 'Terms & Conditions'}</Link></li>
+              <li><Link to="/shipping" className={`opacity-90 hover:opacity-100 ${f}`}>{isUrdu ? 'شپنگ پالیسی' : 'Shipping Policy'}</Link></li>
+              <li><Link to="/refund" className={`opacity-90 hover:opacity-100 ${f}`}>{isUrdu ? 'ریفنڈ پالیسی' : 'Refund Policy'}</Link></li>
             </ul>
           </div>
 
