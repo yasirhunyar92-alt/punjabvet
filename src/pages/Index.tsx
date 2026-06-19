@@ -197,6 +197,8 @@ const Index = () => {
         )}
       </section>
 
+      <RecentlyViewed />
+
       {/* Testimonials */}
       <section className="container py-6 pb-10">
         <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہمارے گاہکوں کی رائے' : 'What Our Customers Say'}</h2>
