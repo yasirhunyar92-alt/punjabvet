@@ -47,6 +47,19 @@ const Profile = () => {
     enabled: !authLoading && !!user,
   });
 
+  const { data: wishlist } = useQuery({
+    queryKey: ['wishlist-full', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('wishlists')
+        .select('product_id, products(*)')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false });
+      return (data || []).map((w: any) => w.products).filter(Boolean);
+    },
+    enabled: !authLoading && !!user,
+  });
+
   const saveProfile = async () => {
     if (!user) return;
     setSaving(true);
