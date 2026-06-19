@@ -11,6 +11,7 @@ import medicinesImg from '@/assets/medicines-category.jpg';
 import vaccinesImg from '@/assets/vaccines-category.jpg';
 import supplementsImg from '@/assets/supplements-category.jpg';
 import PromoBanners from '@/components/PromoBanners';
+import RecentlyViewed from '@/components/RecentlyViewed';
 
 const categoryImages: Record<string, string> = {
   medicines: medicinesImg, vaccines: vaccinesImg, supplements: supplementsImg,
