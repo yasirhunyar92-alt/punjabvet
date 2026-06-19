@@ -243,12 +243,9 @@ const ProductDetail = () => {
       )}
 
       <ProductReviews productId={product.id} />
+      <RecentlyViewed excludeId={product.id} />
     </div>
   );
-};
-
-const ProductDetailWithRecent = () => {
-  return null;
 };
 
 export default ProductDetail;
