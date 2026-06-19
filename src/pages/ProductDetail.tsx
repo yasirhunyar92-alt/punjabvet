@@ -41,6 +41,10 @@ const ProductDetail = () => {
     enabled: !!product?.category_id,
   });
 
+  useEffect(() => {
+    if (product?.id) addRecent(product.id);
+  }, [product?.id, addRecent]);
+
   const handleBuyNow = async () => {
     if (!product) return;
     await addToCart(product.id);
