@@ -130,10 +130,15 @@ const ProductDetail = () => {
 
         {/* Info */}
         <div>
-          {product.categories && (
-            <Badge variant="secondary" className={`mb-2 ${fontClass}`}>{categoryName}</Badge>
-          )}
-          <h1 className={`text-2xl font-bold text-foreground mb-2 ${fontClass}`}>{displayName}</h1>
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div>
+              {product.categories && (
+                <Badge variant="secondary" className={`mb-2 ${fontClass}`}>{categoryName}</Badge>
+              )}
+              <h1 className={`text-2xl font-bold text-foreground ${fontClass}`}>{displayName}</h1>
+            </div>
+            <WishlistButton productId={product.id} size={20} className="!p-2 flex-shrink-0" />
+          </div>
 
           {/* Rating */}
           {product.rating != null && product.rating > 0 && (
