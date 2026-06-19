@@ -335,6 +335,22 @@ export const translations = {
     newest: 'نئی',
     popularity: 'مقبولیت',
     clearFilters: 'فلٹرز صاف کریں',
+
+    wishlist: 'پسندیدہ فہرست',
+    addToWishlist: 'پسندیدہ میں شامل کریں',
+    removedFromWishlist: 'پسندیدہ سے ہٹا دیا گیا',
+    addedToWishlist: 'پسندیدہ میں شامل ہو گیا',
+    emptyWishlist: 'آپ کی پسندیدہ فہرست خالی ہے',
+    recentlyViewed: 'حال ہی میں دیکھا گیا',
+    customerReviews: 'گاہکوں کے جائزے',
+    writeReview: 'جائزہ لکھیں',
+    yourRating: 'آپ کی ریٹنگ',
+    reviewTitle: 'جائزے کا عنوان',
+    reviewComment: 'آپ کا جائزہ',
+    submitReview: 'جائزہ جمع کریں',
+    reviewPending: 'شکریہ! آپ کا جائزہ منظوری کا منتظر ہے۔',
+    noReviewsYet: 'ابھی کوئی جائزہ نہیں۔ پہلے بنیں!',
+    loginToReview: 'جائزہ لکھنے کے لیے لاگ ان کریں۔',
   },
 } as const;
 
