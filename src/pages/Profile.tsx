@@ -115,6 +115,9 @@ const Profile = () => {
           <TabsTrigger value="orders" className={`flex-1 ${fontClass}`}>
             <Package size={16} className="mr-1" /> {t('orderHistory')}
           </TabsTrigger>
+          <TabsTrigger value="wishlist" className={`flex-1 ${fontClass}`}>
+            <Heart size={16} className="mr-1" /> {t('wishlist')}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
