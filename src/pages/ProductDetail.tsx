@@ -21,6 +21,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [selectedImage, setSelectedImage] = useState(0);
+  const { add: addRecent } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
