@@ -41,7 +41,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
             <Badge className="absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-destructive hover:bg-destructive">{t('featured')}</Badge>
           )}
           {hasDiscount && (
-            <Badge className="absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
+            <Badge className="absolute bottom-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
               -{Math.round(((price - discountPrice) / price) * 100)}%
             </Badge>
           )}
