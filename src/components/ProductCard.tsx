@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
+import WishlistButton from '@/components/WishlistButton';
 
 interface ProductCardProps {
   id: string;
@@ -28,7 +29,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
   const hasDiscount = discountPrice && discountPrice < price;
 
   return (
-    <div className="bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+    <div className="relative bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
       <Link to={`/product/${id}`} className="block">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
@@ -40,7 +41,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
             <Badge className="absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-destructive hover:bg-destructive">{t('featured')}</Badge>
           )}
           {hasDiscount && (
-            <Badge className="absolute top-1.5 right-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
+            <Badge className="absolute bottom-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
               -{Math.round(((price - discountPrice) / price) * 100)}%
             </Badge>
           )}
@@ -51,6 +52,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
           )}
         </div>
       </Link>
+      <WishlistButton productId={id} className="absolute top-1.5 right-1.5 z-10" />
 
       <div className="p-2.5 flex flex-col flex-1">
         <Link to={`/product/${id}`}>

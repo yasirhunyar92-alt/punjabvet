@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
-import { LogOut, User as UserIcon, Package, MapPin } from 'lucide-react';
+import { LogOut, User as UserIcon, Package, MapPin, Heart } from 'lucide-react';
+import ProductCard from '@/components/ProductCard';
 
 const Profile = () => {
   const { t, isUrdu } = useLanguage();
@@ -42,6 +43,19 @@ const Profile = () => {
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
       return data || [];
+    },
+    enabled: !authLoading && !!user,
+  });
+
+  const { data: wishlist } = useQuery({
+    queryKey: ['wishlist-full', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('wishlists')
+        .select('product_id, products(*)')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false });
+      return (data || []).map((w: any) => w.products).filter(Boolean);
     },
     enabled: !authLoading && !!user,
   });
@@ -100,6 +114,9 @@ const Profile = () => {
           </TabsTrigger>
           <TabsTrigger value="orders" className={`flex-1 ${fontClass}`}>
             <Package size={16} className="mr-1" /> {t('orderHistory')}
+          </TabsTrigger>
+          <TabsTrigger value="wishlist" className={`flex-1 ${fontClass}`}>
+            <Heart size={16} className="mr-1" /> {t('wishlist')}
           </TabsTrigger>
         </TabsList>
 
@@ -160,6 +177,23 @@ const Profile = () => {
             <div className={`text-center py-12 text-muted-foreground ${fontClass}`}>
               <Package size={48} className="mx-auto mb-4" />
               <p>{t('noResults')}</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="wishlist">
+          {wishlist && wishlist.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {wishlist.map((p: any) => (
+                <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
+                  discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
+                  tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+              ))}
+            </div>
+          ) : (
+            <div className={`text-center py-12 text-muted-foreground ${fontClass}`}>
+              <Heart size={48} className="mx-auto mb-4" />
+              <p>{t('emptyWishlist')}</p>
             </div>
           )}
         </TabsContent>

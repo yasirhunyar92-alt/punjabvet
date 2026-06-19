@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,10 @@ import { ShoppingCart, MessageCircle, Star, ChevronRight, Zap } from 'lucide-rea
 import ProductCard from '@/components/ProductCard';
 import { Badge } from '@/components/ui/badge';
 import SEOHead from '@/components/SEOHead';
+import WishlistButton from '@/components/WishlistButton';
+import ProductReviews from '@/components/ProductReviews';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -17,6 +21,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [selectedImage, setSelectedImage] = useState(0);
+  const { add: addRecent } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -35,6 +40,10 @@ const ProductDetail = () => {
     },
     enabled: !!product?.category_id,
   });
+
+  useEffect(() => {
+    if (product?.id) addRecent(product.id);
+  }, [product?.id, addRecent]);
 
   const handleBuyNow = async () => {
     if (!product) return;
@@ -121,10 +130,15 @@ const ProductDetail = () => {
 
         {/* Info */}
         <div>
-          {product.categories && (
-            <Badge variant="secondary" className={`mb-2 ${fontClass}`}>{categoryName}</Badge>
-          )}
-          <h1 className={`text-2xl font-bold text-foreground mb-2 ${fontClass}`}>{displayName}</h1>
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div>
+              {product.categories && (
+                <Badge variant="secondary" className={`mb-2 ${fontClass}`}>{categoryName}</Badge>
+              )}
+              <h1 className={`text-2xl font-bold text-foreground ${fontClass}`}>{displayName}</h1>
+            </div>
+            <WishlistButton productId={product.id} size={20} className="!p-2 flex-shrink-0" />
+          </div>
 
           {/* Rating */}
           {product.rating != null && product.rating > 0 && (
@@ -227,6 +241,9 @@ const ProductDetail = () => {
           </div>
         </section>
       )}
+
+      <ProductReviews productId={product.id} />
+      <RecentlyViewed excludeId={product.id} />
     </div>
   );
 };
