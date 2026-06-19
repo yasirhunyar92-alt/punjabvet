@@ -165,6 +165,23 @@ export const translations = {
     newest: 'Newest',
     popularity: 'Popularity',
     clearFilters: 'Clear Filters',
+
+    // Engagement
+    wishlist: 'Wishlist',
+    addToWishlist: 'Add to Wishlist',
+    removedFromWishlist: 'Removed from wishlist',
+    addedToWishlist: 'Added to wishlist',
+    emptyWishlist: 'Your wishlist is empty',
+    recentlyViewed: 'Recently Viewed',
+    customerReviews: 'Customer Reviews',
+    writeReview: 'Write a Review',
+    yourRating: 'Your Rating',
+    reviewTitle: 'Review Title',
+    reviewComment: 'Your Review',
+    submitReview: 'Submit Review',
+    reviewPending: 'Thanks! Your review is pending approval.',
+    noReviewsYet: 'No reviews yet. Be the first to review!',
+    loginToReview: 'Please log in to write a review.',
   },
   ur: {
     storeName: 'پنجاب ویٹرنری میڈیکل سٹور',
