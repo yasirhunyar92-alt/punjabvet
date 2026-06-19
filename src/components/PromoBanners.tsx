@@ -42,9 +42,9 @@ const PromoBanners = () => {
     return () => clearInterval(i);
   }, [banners]);
 
-  if (!banners || banners.length === 0) return null;
-  const b = banners[idx];
-  const countdown = useCountdown(b.countdown_to);
+  const b = banners?.[idx];
+  const countdown = useCountdown(b?.countdown_to);
+  if (!banners || banners.length === 0 || !b) return null;
   const title = isUrdu && b.title_ur ? b.title_ur : b.title;
   const subtitle = isUrdu && b.subtitle_ur ? b.subtitle_ur : b.subtitle;
 
