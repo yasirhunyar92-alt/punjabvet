@@ -241,8 +241,14 @@ const ProductDetail = () => {
           </div>
         </section>
       )}
+
+      <ProductReviews productId={product.id} />
     </div>
   );
+};
+
+const ProductDetailWithRecent = () => {
+  return null;
 };
 
 export default ProductDetail;
