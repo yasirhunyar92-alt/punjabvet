@@ -180,6 +180,23 @@ const Profile = () => {
             </div>
           )}
         </TabsContent>
+
+        <TabsContent value="wishlist">
+          {wishlist && wishlist.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {wishlist.map((p: any) => (
+                <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
+                  discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
+                  tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+              ))}
+            </div>
+          ) : (
+            <div className={`text-center py-12 text-muted-foreground ${fontClass}`}>
+              <Heart size={48} className="mx-auto mb-4" />
+              <p>{t('emptyWishlist')}</p>
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );
