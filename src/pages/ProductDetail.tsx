@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,10 @@ import { ShoppingCart, MessageCircle, Star, ChevronRight, Zap } from 'lucide-rea
 import ProductCard from '@/components/ProductCard';
 import { Badge } from '@/components/ui/badge';
 import SEOHead from '@/components/SEOHead';
+import WishlistButton from '@/components/WishlistButton';
+import ProductReviews from '@/components/ProductReviews';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 const ProductDetail = () => {
   const { id } = useParams();
