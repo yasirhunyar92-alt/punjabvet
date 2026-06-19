@@ -29,8 +29,8 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
   const hasDiscount = discountPrice && discountPrice < price;
 
   return (
-    <div className="bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-      <Link to={`/product/${id}`} className="block">
+    <div className="relative bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+      {/* Discount badge moved here for layering and wishlist top-right */}
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
             <img src={imageUrl} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
