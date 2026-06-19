@@ -52,6 +52,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
           )}
         </div>
       </Link>
+      <WishlistButton productId={id} className="absolute top-1.5 right-1.5 z-10" />
 
       <div className="p-2.5 flex flex-col flex-1">
         <Link to={`/product/${id}`}>
