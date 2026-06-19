@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
+import WishlistButton from '@/components/WishlistButton';
 
 interface ProductCardProps {
   id: string;
