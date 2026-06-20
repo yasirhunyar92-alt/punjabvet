@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon, FileText } from 'lucide-react';
+import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon, FileText, Upload } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CouponsManagement from '@/components/admin/CouponsManagement';
 import BannersManagement from '@/components/admin/BannersManagement';
 import BlogManagement from '@/components/admin/BlogManagement';
+import BulkImport from '@/components/admin/BulkImport';
 
 const Admin = () => {
   const { t, isUrdu } = useLanguage();
@@ -45,6 +46,7 @@ const Admin = () => {
           <TabsTrigger value="coupons" className={fontClass}><Tag size={14} className="mr-1" /> Coupons</TabsTrigger>
           <TabsTrigger value="banners" className={fontClass}><ImageIcon size={14} className="mr-1" /> Banners</TabsTrigger>
           <TabsTrigger value="blog" className={fontClass}><FileText size={14} className="mr-1" /> Blog</TabsTrigger>
+          <TabsTrigger value="import" className={fontClass}><Upload size={14} className="mr-1" /> Bulk CSV</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
@@ -54,6 +56,7 @@ const Admin = () => {
         <TabsContent value="coupons"><CouponsManagement /></TabsContent>
         <TabsContent value="banners"><BannersManagement /></TabsContent>
         <TabsContent value="blog"><BlogManagement /></TabsContent>
+        <TabsContent value="import"><BulkImport /></TabsContent>
       </Tabs>
     </div>
   );
