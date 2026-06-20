@@ -46,6 +46,7 @@ const Admin = () => {
           <TabsTrigger value="coupons" className={fontClass}><Tag size={14} className="mr-1" /> Coupons</TabsTrigger>
           <TabsTrigger value="banners" className={fontClass}><ImageIcon size={14} className="mr-1" /> Banners</TabsTrigger>
           <TabsTrigger value="blog" className={fontClass}><FileText size={14} className="mr-1" /> Blog</TabsTrigger>
+          <TabsTrigger value="import" className={fontClass}><Upload size={14} className="mr-1" /> Bulk CSV</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
@@ -55,6 +56,7 @@ const Admin = () => {
         <TabsContent value="coupons"><CouponsManagement /></TabsContent>
         <TabsContent value="banners"><BannersManagement /></TabsContent>
         <TabsContent value="blog"><BlogManagement /></TabsContent>
+        <TabsContent value="import"><BulkImport /></TabsContent>
       </Tabs>
     </div>
   );
