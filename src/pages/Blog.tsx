@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight, ArrowLeft, Clock, User, Tag } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import SEOHead from '@/components/SEOHead';
 
 interface BlogPost {
@@ -257,7 +259,57 @@ Available at Punjab Veterinary Medical Store, Sillanwali. Call 0306-5757283.`,
 const Blog = () => {
   const { isUrdu } = useLanguage();
   const f = isUrdu ? 'font-urdu' : '';
+  const navigate = useNavigate();
+  const { slug: routeSlug } = useParams<{ slug?: string }>();
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  const { data: dbPosts = [] } = useQuery({
+    queryKey: ['blog_posts_public'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('id, slug, title, title_ur, excerpt, excerpt_ur, content, content_ur, category, published_at, cover_image')
+        .eq('published', true)
+        .order('published_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((p): BlogPost => ({
+        id: 1000 + Math.abs(p.slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)),
+        slug: p.slug,
+        title: p.title,
+        titleUr: p.title_ur || p.title,
+        excerpt: p.excerpt || '',
+        excerptUr: p.excerpt_ur || p.excerpt || '',
+        content: p.content,
+        contentUr: p.content_ur || p.content,
+        date: (p.published_at || new Date().toISOString()).split('T')[0],
+        category: p.category || 'General',
+        categoryUr: p.category || 'عام',
+        readTime: `${Math.max(2, Math.round((p.content || '').split(/\s+/).length / 200))} min`,
+        author: 'Punjab Vet Team',
+      }));
+    },
+  });
+
+  const allPosts = [...dbPosts, ...blogPosts];
+
+  useEffect(() => {
+    if (routeSlug) {
+      const found = allPosts.find(p => p.slug === routeSlug);
+      if (found) setSelectedPost(found);
+    } else {
+      setSelectedPost(null);
+    }
+  }, [routeSlug, allPosts.length]);
+
+  const openPost = (p: BlogPost) => {
+    setSelectedPost(p);
+    navigate(`/blog/${p.slug}`);
+  };
+
+  const closePost = () => {
+    setSelectedPost(null);
+    navigate('/blog');
+  };
 
   if (selectedPost) {
     return (
@@ -279,7 +331,7 @@ const Blog = () => {
           }}
         />
         <div className="container py-6 max-w-3xl">
-          <button onClick={() => setSelectedPost(null)} className={`inline-flex items-center gap-1 text-muted-foreground hover:text-foreground mb-4 text-sm ${f}`}>
+          <button onClick={closePost} className={`inline-flex items-center gap-1 text-muted-foreground hover:text-foreground mb-4 text-sm ${f}`}>
             <ArrowLeft size={16} /> {isUrdu ? 'واپس بلاگ' : 'Back to Blog'}
           </button>
 
@@ -354,9 +406,9 @@ const Blog = () => {
 
       <div className="container py-8">
         <div className="grid gap-5 md:grid-cols-2">
-          {blogPosts.map((post, i) => (
-            <motion.article key={post.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-              className="bg-card rounded-xl border shadow-sm overflow-hidden card-elevated cursor-pointer" onClick={() => setSelectedPost(post)}>
+          {allPosts.map((post, i) => (
+            <motion.article key={`${post.slug}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="bg-card rounded-xl border shadow-sm overflow-hidden card-elevated cursor-pointer" onClick={() => openPost(post)}>
               <div className="h-2 hero-gradient" />
               <div className="p-5">
                 <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2">
