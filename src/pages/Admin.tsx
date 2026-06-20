@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon, FileText } from 'lucide-react';
+import { Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon, FileText, Upload } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CouponsManagement from '@/components/admin/CouponsManagement';
 import BannersManagement from '@/components/admin/BannersManagement';
 import BlogManagement from '@/components/admin/BlogManagement';
+import BulkImport from '@/components/admin/BulkImport';
 
 const Admin = () => {
   const { t, isUrdu } = useLanguage();
