@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/sitemap.ts",
-      "use": "@vercel/node"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -15,24 +11,11 @@
   ],
   "routes": [
     {
-      "src": "/api/sitemap(-\\d+)?\\.xml",
-      "dest": "/api/sitemap.ts",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/robots\\.txt",
-      "dest": "/public/robots.txt",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.ts",
-      "methods": ["GET"]
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html",
-      "status": 200
+      "dest": "/index.html"
+    }
+  ]
+}
     }
   ],
   }
