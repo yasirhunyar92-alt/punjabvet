@@ -206,22 +206,6 @@ const Products = () => {
           </div>
         </div>
       )}
-              <div className="flex flex-wrap gap-1.5">
-                <button onClick={() => setSelectedTag('all')}
-                  className={`text-xs px-3 py-1 rounded-full border transition-colors ${selectedTag === 'all' ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:border-primary'}`}>
-                  All
-                </button>
-                {allTags.map(tag => (
-                  <button key={tag} onClick={() => setSelectedTag(tag)}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${selectedTag === tag ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:border-primary'}`}>
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Results */}
       {isLoading ? (
