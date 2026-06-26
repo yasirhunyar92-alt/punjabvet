@@ -24,6 +24,8 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all');
   const [selectedAnimal, setSelectedAnimal] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
+  const [priceMin, setPriceMin] = useState<string>('');
+  const [priceMax, setPriceMax] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
 
   const { data: categories } = useQuery({
@@ -76,17 +78,23 @@ const Products = () => {
     // Tag
     if (selectedTag !== 'all') result = result.filter(p => (p.tags || []).includes(selectedTag));
 
+    // Price range
+    const min = parseFloat(priceMin);
+    const max = parseFloat(priceMax);
+    if (!isNaN(min)) result = result.filter(p => (p.discount_price ?? p.price) >= min);
+    if (!isNaN(max)) result = result.filter(p => (p.discount_price ?? p.price) <= max);
+
     // Sort
     if (sortBy === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (sortBy === 'price-high') result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [products, searchQuery, selectedCategory, selectedAnimal, selectedTag, sortBy]);
+  }, [products, searchQuery, selectedCategory, selectedAnimal, selectedTag, sortBy, priceMin, priceMax]);
 
-  const hasActiveFilters = selectedCategory !== 'all' || selectedAnimal !== 'all' || selectedTag !== 'all' || searchQuery.trim();
+  const hasActiveFilters = selectedCategory !== 'all' || selectedAnimal !== 'all' || selectedTag !== 'all' || searchQuery.trim() || priceMin || priceMax;
 
   const clearFilters = () => {
-    setSelectedCategory('all'); setSelectedAnimal('all'); setSelectedTag('all'); setSearchQuery('');
+    setSelectedCategory('all'); setSelectedAnimal('all'); setSelectedTag('all'); setSearchQuery(''); setPriceMin(''); setPriceMax('');
   };
 
   return (
@@ -185,6 +193,17 @@ const Products = () => {
               </div>
             </div>
           )}
+
+          <div>
+            <p className={`text-xs font-semibold mb-1.5 ${fontClass}`}>{isUrdu ? 'قیمت کی حد (روپے)' : 'Price Range (PKR)'}</p>
+            <div className="flex items-center gap-2">
+              <Input type="number" min="0" placeholder={isUrdu ? 'کم سے کم' : 'Min'} value={priceMin}
+                onChange={e => setPriceMin(e.target.value)} className="h-8 w-28 text-xs" />
+              <span className="text-muted-foreground text-xs">—</span>
+              <Input type="number" min="0" placeholder={isUrdu ? 'زیادہ سے زیادہ' : 'Max'} value={priceMax}
+                onChange={e => setPriceMax(e.target.value)} className="h-8 w-28 text-xs" />
+            </div>
+          </div>
         </div>
       )}
 
