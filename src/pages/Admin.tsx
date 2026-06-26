@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,17 +10,18 @@ import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon,
-  FileText, Upload, LayoutDashboard, FolderTree, Bell, Search, Stethoscope, Menu, X,
+  FileText, Upload, LayoutDashboard, FolderTree, Bell, Search, Stethoscope, Menu, X, Sparkles,
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CouponsManagement from '@/components/admin/CouponsManagement';
 import BannersManagement from '@/components/admin/BannersManagement';
 import BlogManagement from '@/components/admin/BlogManagement';
 import BulkImport from '@/components/admin/BulkImport';
+import BulkImageUpload from '@/components/admin/BulkImageUpload';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -37,6 +38,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
       { id: 'categories', label: 'Categories', icon: FolderTree },
       { id: 'coupons', label: 'Coupons', icon: Tag },
       { id: 'import', label: 'Bulk CSV', icon: Upload },
+      { id: 'bulk-photos', label: 'Bulk Upload Products', icon: Sparkles },
     ],
   },
   {
@@ -57,6 +59,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   banners: { title: 'Banners', subtitle: 'Update homepage promotional banners' },
   blog: { title: 'Blog', subtitle: 'Publish articles and health tips' },
   import: { title: 'Bulk CSV Import', subtitle: 'Upload products and categories in bulk' },
+  'bulk-photos': { title: 'Bulk Upload Products', subtitle: 'AI scans product photos and creates listings automatically' },
 };
 
 const Admin = () => {
@@ -73,11 +76,15 @@ const Admin = () => {
     },
   });
 
+  useEffect(() => {
+    if (user === null) navigate('/auth?redirect=/admin', { replace: true });
+  }, [user, navigate]);
+
   if (!user || !isAdmin) {
     return (
       <div className="container py-16 text-center">
         <p className="text-lg text-destructive">Access Denied. Admin only.</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/')}>Go Home</Button>
+        <Button variant="outline" className="mt-4" onClick={() => navigate('/auth')}>Login</Button>
       </div>
     );
   }
@@ -96,6 +103,7 @@ const Admin = () => {
       case 'banners': return <BannersManagement />;
       case 'blog': return <BlogManagement />;
       case 'import': return <BulkImport />;
+      case 'bulk-photos': return <BulkImageUpload />;
     }
   };
 
