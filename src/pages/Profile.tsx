@@ -87,6 +87,28 @@ const Profile = () => {
     cancelled: 'bg-destructive/20 text-destructive',
   };
 
+  const trackingSteps: { key: string; label: string; labelUr: string; icon: any }[] = [
+    { key: 'pending', label: 'Order Placed', labelUr: 'آرڈر موصول', icon: ClipboardList },
+    { key: 'processing', label: 'Preparing', labelUr: 'تیاری میں', icon: Package },
+    { key: 'shipped', label: 'Out for Delivery', labelUr: 'ڈیلیوری کے لیے روانہ', icon: Truck },
+    { key: 'completed', label: 'Delivered', labelUr: 'ڈیلیور ہو گیا', icon: CheckCircle2 },
+  ];
+
+  const stepIndex = (status: string) => {
+    const map: Record<string, number> = { pending: 0, processing: 1, shipped: 2, completed: 3, cancelled: -1 };
+    return map[status] ?? 0;
+  };
+
+  const reorder = async (items: any[]) => {
+    if (!items?.length) return;
+    for (const it of items) {
+      if (it.product_id) await addToCart(it.product_id);
+    }
+    toast.success(isUrdu ? 'کارٹ میں شامل ہو گیا' : 'Items added to cart');
+    navigate('/cart');
+  };
+
+
   if (authLoading) {
     return <div className="container py-16 text-center text-muted-foreground">{t('loading')}</div>;
   }
