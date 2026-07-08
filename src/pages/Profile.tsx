@@ -10,8 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
-import { LogOut, User as UserIcon, Package, MapPin, Heart } from 'lucide-react';
+import { LogOut, User as UserIcon, Package, MapPin, Heart, RotateCw, CheckCircle2, Circle, Truck, ClipboardList } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
+import { useCart } from '@/contexts/CartContext';
 
 const Profile = () => {
   const { t, isUrdu } = useLanguage();
