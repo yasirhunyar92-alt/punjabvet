@@ -173,12 +173,40 @@ const Profile = () => {
             <div className="space-y-4">
               {orders.map(order => (
                 <div key={order.id} className="bg-card border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground">#{order.id.slice(0, 8).toUpperCase()}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
+                    </div>
                     <Badge className={statusColors[order.status] || ''}>
                       {t(order.status as any) || order.status}
                     </Badge>
                   </div>
+
+                  {order.status !== 'cancelled' && (
+                    <div className="mb-4 rounded-md bg-muted/40 p-3">
+                      <div className="flex items-center justify-between">
+                        {trackingSteps.map((step, i) => {
+                          const active = i <= stepIndex(order.status);
+                          const Icon = active ? step.icon : Circle;
+                          return (
+                            <div key={step.key} className="flex-1 flex flex-col items-center relative">
+                              {i > 0 && (
+                                <div className={`absolute top-3 right-1/2 w-full h-0.5 ${i <= stepIndex(order.status) ? 'bg-primary' : 'bg-border'}`} />
+                              )}
+                              <div className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center ${active ? 'bg-primary text-primary-foreground' : 'bg-background border border-border text-muted-foreground'}`}>
+                                <Icon size={12} />
+                              </div>
+                              <span className={`mt-1 text-[9px] text-center leading-tight ${active ? 'text-foreground font-medium' : 'text-muted-foreground'} ${fontClass}`}>
+                                {isUrdu ? step.labelUr : step.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-1">
                     {(order.order_items as any[])?.map((item: any) => (
                       <div key={item.id} className="flex justify-between text-sm">
@@ -194,6 +222,16 @@ const Profile = () => {
                   {order.address && (
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><MapPin size={12} /> {order.address}</p>
                   )}
+                  <div className="mt-3 flex gap-2">
+                    <Button size="sm" variant="outline" className={`flex-1 ${fontClass}`} onClick={() => reorder(order.order_items as any[])}>
+                      <RotateCw size={14} className="mr-1" /> {isUrdu ? 'دوبارہ آرڈر' : 'Reorder'}
+                    </Button>
+                    <a href={`https://wa.me/923065757283?text=${encodeURIComponent(`Order #${order.id.slice(0,8).toUpperCase()} inquiry`)}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                      <Button size="sm" variant="secondary" className={`w-full ${fontClass}`}>
+                        {isUrdu ? 'مدد چاہیے' : 'Need help?'}
+                      </Button>
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
