@@ -10,13 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
-import { LogOut, User as UserIcon, Package, MapPin, Heart } from 'lucide-react';
+import { LogOut, User as UserIcon, Package, MapPin, Heart, RotateCw, CheckCircle2, Circle, Truck, ClipboardList } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
+import { useCart } from '@/contexts/CartContext';
 
 const Profile = () => {
   const { t, isUrdu } = useLanguage();
   const { user, signOut, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [profileForm, setProfileForm] = useState({ name: '', phone: '', address: '' });
   const [saving, setSaving] = useState(false);
@@ -85,6 +87,28 @@ const Profile = () => {
     cancelled: 'bg-destructive/20 text-destructive',
   };
 
+  const trackingSteps: { key: string; label: string; labelUr: string; icon: any }[] = [
+    { key: 'pending', label: 'Order Placed', labelUr: 'آرڈر موصول', icon: ClipboardList },
+    { key: 'processing', label: 'Preparing', labelUr: 'تیاری میں', icon: Package },
+    { key: 'shipped', label: 'Out for Delivery', labelUr: 'ڈیلیوری کے لیے روانہ', icon: Truck },
+    { key: 'completed', label: 'Delivered', labelUr: 'ڈیلیور ہو گیا', icon: CheckCircle2 },
+  ];
+
+  const stepIndex = (status: string) => {
+    const map: Record<string, number> = { pending: 0, processing: 1, shipped: 2, completed: 3, cancelled: -1 };
+    return map[status] ?? 0;
+  };
+
+  const reorder = async (items: any[]) => {
+    if (!items?.length) return;
+    for (const it of items) {
+      if (it.product_id) await addToCart(it.product_id);
+    }
+    toast.success(isUrdu ? 'کارٹ میں شامل ہو گیا' : 'Items added to cart');
+    navigate('/cart');
+  };
+
+
   if (authLoading) {
     return <div className="container py-16 text-center text-muted-foreground">{t('loading')}</div>;
   }
@@ -149,12 +173,40 @@ const Profile = () => {
             <div className="space-y-4">
               {orders.map(order => (
                 <div key={order.id} className="bg-card border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground">#{order.id.slice(0, 8).toUpperCase()}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
+                    </div>
                     <Badge className={statusColors[order.status] || ''}>
                       {t(order.status as any) || order.status}
                     </Badge>
                   </div>
+
+                  {order.status !== 'cancelled' && (
+                    <div className="mb-4 rounded-md bg-muted/40 p-3">
+                      <div className="flex items-center justify-between">
+                        {trackingSteps.map((step, i) => {
+                          const active = i <= stepIndex(order.status);
+                          const Icon = active ? step.icon : Circle;
+                          return (
+                            <div key={step.key} className="flex-1 flex flex-col items-center relative">
+                              {i > 0 && (
+                                <div className={`absolute top-3 right-1/2 w-full h-0.5 ${i <= stepIndex(order.status) ? 'bg-primary' : 'bg-border'}`} />
+                              )}
+                              <div className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center ${active ? 'bg-primary text-primary-foreground' : 'bg-background border border-border text-muted-foreground'}`}>
+                                <Icon size={12} />
+                              </div>
+                              <span className={`mt-1 text-[9px] text-center leading-tight ${active ? 'text-foreground font-medium' : 'text-muted-foreground'} ${fontClass}`}>
+                                {isUrdu ? step.labelUr : step.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-1">
                     {(order.order_items as any[])?.map((item: any) => (
                       <div key={item.id} className="flex justify-between text-sm">
@@ -170,6 +222,16 @@ const Profile = () => {
                   {order.address && (
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><MapPin size={12} /> {order.address}</p>
                   )}
+                  <div className="mt-3 flex gap-2">
+                    <Button size="sm" variant="outline" className={`flex-1 ${fontClass}`} onClick={() => reorder(order.order_items as any[])}>
+                      <RotateCw size={14} className="mr-1" /> {isUrdu ? 'دوبارہ آرڈر' : 'Reorder'}
+                    </Button>
+                    <a href={`https://wa.me/923065757283?text=${encodeURIComponent(`Order #${order.id.slice(0,8).toUpperCase()} inquiry`)}`} target="_blank" rel="noopener noreferrer" className="flex-1">
+                      <Button size="sm" variant="secondary" className={`w-full ${fontClass}`}>
+                        {isUrdu ? 'مدد چاہیے' : 'Need help?'}
+                      </Button>
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
