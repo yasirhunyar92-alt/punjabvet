@@ -18,6 +18,7 @@ const Profile = () => {
   const { t, isUrdu } = useLanguage();
   const { user, signOut, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [profileForm, setProfileForm] = useState({ name: '', phone: '', address: '' });
   const [saving, setSaving] = useState(false);
