@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, ChevronDown, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, ChevronDown, Loader2, Sparkles } from 'lucide-react';
 import MultiImageUpload from './MultiImageUpload';
 import TagInput from './TagInput';
 
@@ -43,6 +43,55 @@ const ProductsManagement = () => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [form, setForm] = useState<ProductForm>({ ...emptyForm });
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiGenLoading, setAiGenLoading] = useState(false);
+
+  const handleAiGenerateFromName = async () => {
+    if (!form.name.trim()) { toast.error('Enter a product name first'); return; }
+    setAiGenLoading(true);
+    const toastId = toast.loading('AI is researching this product...');
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-product-generate', {
+        body: { productName: form.name.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const p = data?.product || {};
+
+      // Map category name → id
+      let categoryId = form.category_id;
+      if (p.category && categories) {
+        const match = categories.find((c: any) =>
+          c.name?.toLowerCase() === String(p.category).toLowerCase()
+        );
+        if (match) categoryId = match.id;
+      }
+
+      setForm(prev => ({
+        ...prev,
+        name: p.name || prev.name,
+        name_ur: p.name_ur || prev.name_ur,
+        brand: p.brand || prev.brand,
+        category_id: categoryId,
+        description: p.description || prev.description,
+        description_ur: p.description_ur || prev.description_ur,
+        price: p.suggested_price_pkr ? String(p.suggested_price_pkr) : prev.price,
+        volume_size: p.volume_size || p.pack_size || prev.volume_size,
+        tags: Array.isArray(p.tags) && p.tags.length ? p.tags : prev.tags,
+        animal_type: Array.isArray(p.animal_type)
+          ? p.animal_type.filter((a: string) => ANIMAL_TYPES.includes(a))
+          : prev.animal_type,
+        usage_instructions: p.usage_instructions || prev.usage_instructions,
+        usage_instructions_ur: p.usage_instructions_ur || prev.usage_instructions_ur,
+      }));
+      setMoreOpen(true);
+      toast.success('AI filled the form. Review & save.', { id: toastId });
+    } catch (err: any) {
+      const msg = err?.message || 'AI generation failed';
+      toast.error(msg.includes('402') || msg.toLowerCase().includes('credits') ? 'AI credits exhausted. Add credits in Settings.' : msg, { id: toastId });
+    } finally {
+      setAiGenLoading(false);
+    }
+  };
 
   const handleAiGenerate = async (imageUrl: string) => {
     if (!imageUrl) { toast.error('Upload an image first'); return; }
