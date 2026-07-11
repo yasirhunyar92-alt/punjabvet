@@ -18,10 +18,11 @@ import BannersManagement from '@/components/admin/BannersManagement';
 import BlogManagement from '@/components/admin/BlogManagement';
 import BulkImport from '@/components/admin/BulkImport';
 import BulkImageUpload from '@/components/admin/BulkImageUpload';
+import AiBulkImport from '@/components/admin/AiBulkImport';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -39,6 +40,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
       { id: 'coupons', label: 'Coupons', icon: Tag },
       { id: 'import', label: 'Bulk CSV', icon: Upload },
       { id: 'bulk-photos', label: 'Bulk Upload Products', icon: Sparkles },
+      { id: 'ai-bulk', label: 'AI Bulk Import', icon: Sparkles },
     ],
   },
   {
@@ -60,6 +62,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   blog: { title: 'Blog', subtitle: 'Publish articles and health tips' },
   import: { title: 'Bulk CSV Import', subtitle: 'Upload products and categories in bulk' },
   'bulk-photos': { title: 'Bulk Upload Products', subtitle: 'AI scans product photos and creates listings automatically' },
+  'ai-bulk': { title: 'AI Bulk Product Import', subtitle: 'Enter names — AI fills all fields and saves' },
 };
 
 const Admin = () => {
@@ -104,6 +107,7 @@ const Admin = () => {
       case 'blog': return <BlogManagement />;
       case 'import': return <BulkImport />;
       case 'bulk-photos': return <BulkImageUpload />;
+      case 'ai-bulk': return <AiBulkImport />;
     }
   };
 
