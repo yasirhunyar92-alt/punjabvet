@@ -330,6 +330,19 @@ const ProductsManagement = () => {
               </div>
             </div>
 
+            {/* AI Generate from name */}
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 flex items-center gap-3">
+              <Sparkles size={18} className="text-primary shrink-0" />
+              <div className="flex-1 text-xs">
+                <p className="font-semibold text-foreground">AI Product Auto Fill</p>
+                <p className="text-muted-foreground">Enter the product name above, then click generate.</p>
+              </div>
+              <Button size="sm" type="button" onClick={handleAiGenerateFromName} disabled={aiGenLoading || !form.name.trim()}>
+                {aiGenLoading ? <Loader2 size={14} className="animate-spin mr-1" /> : <Sparkles size={14} className="mr-1" />}
+                Generate with AI
+              </Button>
+            </div>
+
             {/* Images */}
             {aiLoading && (
               <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg text-sm text-primary">
