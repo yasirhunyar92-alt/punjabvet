@@ -438,7 +438,12 @@ const AiProductImporter = () => {
           </div>
 
           <Field label="Product Images (upload real product photos)">
-            <MultiImageUpload images={draft.images} onChange={imgs => update('images', imgs)} bucket="product-images" />
+            <MultiImageUpload
+              mainImage={draft.images[0] || ''}
+              images={draft.images}
+              onMainImageChange={(url) => update('images', [url, ...draft.images.filter(i => i !== url)])}
+              onImagesChange={(imgs) => update('images', imgs)}
+            />
             {draft.image_search_query && (
               <p className="text-xs text-slate-400 mt-1">Suggested search: "{draft.image_search_query}"</p>
             )}
@@ -448,8 +453,8 @@ const AiProductImporter = () => {
             <Field label="SEO Title"><Input value={draft.seo_title} onChange={e => update('seo_title', e.target.value)} /></Field>
             <Field label="SEO Description"><Input value={draft.seo_description} onChange={e => update('seo_description', e.target.value)} /></Field>
           </div>
-          <Field label="SEO Keywords"><TagInput tags={draft.seo_keywords} onChange={t => update('seo_keywords', t)} placeholder="Add keyword..." /></Field>
-          <Field label="Product Tags"><TagInput tags={draft.tags} onChange={t => update('tags', t)} placeholder="Add tag..." /></Field>
+          <Field label="SEO Keywords"><TagInput label="" value={draft.seo_keywords} onChange={t => update('seo_keywords', t)} /></Field>
+          <Field label="Product Tags"><TagInput label="" value={draft.tags} onChange={t => update('tags', t)} /></Field>
 
           <div className="flex items-center gap-3 pt-2 border-t">
             <Button onClick={save} disabled={loading} className="gap-2">
