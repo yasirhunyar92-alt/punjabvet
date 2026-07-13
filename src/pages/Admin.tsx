@@ -19,10 +19,11 @@ import BlogManagement from '@/components/admin/BlogManagement';
 import BulkImport from '@/components/admin/BulkImport';
 import BulkImageUpload from '@/components/admin/BulkImageUpload';
 import AiBulkImport from '@/components/admin/AiBulkImport';
+import AiProductImporter from '@/components/admin/AiProductImporter';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -38,6 +39,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
     items: [
       { id: 'categories', label: 'Categories', icon: FolderTree },
       { id: 'coupons', label: 'Coupons', icon: Tag },
+      { id: 'ai-importer', label: 'AI Product Importer', icon: Sparkles },
       { id: 'import', label: 'Bulk CSV', icon: Upload },
       { id: 'bulk-photos', label: 'Bulk Upload Products', icon: Sparkles },
       { id: 'ai-bulk', label: 'AI Bulk Import', icon: Sparkles },
@@ -63,6 +65,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   import: { title: 'Bulk CSV Import', subtitle: 'Upload products and categories in bulk' },
   'bulk-photos': { title: 'Bulk Upload Products', subtitle: 'AI scans product photos and creates listings automatically' },
   'ai-bulk': { title: 'AI Bulk Product Import', subtitle: 'Enter names — AI fills all fields and saves' },
+  'ai-importer': { title: 'AI Product Importer', subtitle: 'Import from name, URL, image, or PDF with preview & edit' },
 };
 
 const Admin = () => {
@@ -108,6 +111,7 @@ const Admin = () => {
       case 'import': return <BulkImport />;
       case 'bulk-photos': return <BulkImageUpload />;
       case 'ai-bulk': return <AiBulkImport />;
+      case 'ai-importer': return <AiProductImporter />;
     }
   };
 
