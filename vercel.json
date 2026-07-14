@@ -29,6 +29,7 @@
       "dest": "/api/$1.ts",
       "methods": ["GET"]
     },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "/index.html",
