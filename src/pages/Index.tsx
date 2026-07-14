@@ -12,6 +12,7 @@ import vaccinesImg from '@/assets/vaccines-category.jpg';
 import supplementsImg from '@/assets/supplements-category.jpg';
 import PromoBanners from '@/components/PromoBanners';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import { useSiteImages } from '@/hooks/useSiteImages';
 
 const categoryImages: Record<string, string> = {
   medicines: medicinesImg, vaccines: vaccinesImg, supplements: supplementsImg,
@@ -20,6 +21,10 @@ const categoryImages: Record<string, string> = {
 const Index = () => {
   const { t, isUrdu } = useLanguage();
   const f = isUrdu ? 'font-urdu' : '';
+  const siteImages = useSiteImages();
+  const heroImg = siteImages.get('hero_banner', heroBanner);
+  const servicesBg = siteImages.get('services_bg', '');
+  const categoriesBg = siteImages.get('categories_bg', '');
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -46,7 +51,7 @@ const Index = () => {
     <div className="min-h-screen bg-muted/30">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <img src={heroBanner} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-96 object-cover" width={1920} height={800} />
+        <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-96 object-cover" width={1920} height={800} />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="container">
@@ -94,7 +99,8 @@ const Index = () => {
       </section>
 
       {/* Services */}
-      <section className="container py-6">
+      <section className="py-6 relative bg-cover bg-center" style={servicesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url(${servicesBg})` } : undefined}>
+        <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہماری خدمات' : 'Our Services'}</h2>
         <div className="grid grid-cols-3 gap-3">
           {[
@@ -110,10 +116,12 @@ const Index = () => {
             </Link>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Categories */}
-      <section className="container py-5">
+      <section className="py-5 relative bg-cover bg-center" style={categoriesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)), url(${categoriesBg})` } : undefined}>
+        <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-3 ${f}`}>{t('categories')}</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {(categories && categories.length > 0 ? categories : [
@@ -134,6 +142,7 @@ const Index = () => {
               </p>
             </Link>
           ))}
+        </div>
         </div>
       </section>
 
