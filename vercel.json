@@ -34,12 +34,5 @@
       "dest": "/index.html",
       "status": 200
     }
-  ],
-  "env": {
-    "VITE_SUPABASE_URL": "@VITE_SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY": "@VITE_SUPABASE_PUBLISHABLE_KEY",
-    "VITE_SUPABASE_PROJECT_ID": "@VITE_SUPABASE_PROJECT_ID",
-    "SUPABASE_SERVICE_KEY": "@SUPABASE_SERVICE_KEY",
-    "SITE_URL": "@SITE_URL"
-  }
+  ]
 }
