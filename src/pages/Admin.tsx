@@ -21,10 +21,11 @@ import BulkImageUpload from '@/components/admin/BulkImageUpload';
 import AiBulkImport from '@/components/admin/AiBulkImport';
 import AiProductImporter from '@/components/admin/AiProductImporter';
 import SiteImagesManagement from '@/components/admin/SiteImagesManagement';
+import NotificationsManagement from '@/components/admin/NotificationsManagement';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -51,6 +52,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
     items: [
       { id: 'banners', label: 'Banners', icon: ImageIcon },
       { id: 'site-images', label: 'Site Images', icon: ImageIcon },
+      { id: 'notifications', label: 'Notifications', icon: Bell },
       { id: 'blog', label: 'Blog', icon: FileText },
     ],
   },
@@ -69,6 +71,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   'ai-bulk': { title: 'AI Bulk Product Import', subtitle: 'Enter names — AI fills all fields and saves' },
   'ai-importer': { title: 'AI Product Importer', subtitle: 'Import from name, URL, image, or PDF with preview & edit' },
   'site-images': { title: 'Site Images', subtitle: 'Manage homepage hero, services, and categories background images' },
+  notifications: { title: 'Notifications', subtitle: 'Send announcements and promotional alerts to customers' },
 };
 
 const Admin = () => {
@@ -80,7 +83,7 @@ const Admin = () => {
   const { data: pendingCount } = useQuery({
     queryKey: ['admin-pending-orders-count'],
     queryFn: async () => {
-      const { count } = await supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+      const { count } = await supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['pending_verification', 'pending']);
       return count || 0;
     },
   });
@@ -116,6 +119,7 @@ const Admin = () => {
       case 'ai-bulk': return <AiBulkImport />;
       case 'ai-importer': return <AiProductImporter />;
       case 'site-images': return <SiteImagesManagement />;
+      case 'notifications': return <NotificationsManagement />;
     }
   };
 
@@ -311,9 +315,18 @@ const AnalyticsDashboard = () => {
   );
 };
 
+const ORDER_STATUSES = [
+  { value: 'pending_verification', label: 'Pending Verification' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'packed', label: 'Packed' },
+  { value: 'shipped', label: 'Shipped' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'rejected', label: 'Rejected' },
+];
+
 const OrdersManagement = () => {
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
 
   const { data: orders } = useQuery({
     queryKey: ['admin-orders'],
@@ -330,65 +343,113 @@ const OrdersManagement = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-pending-orders-count'] });
   };
 
+  const viewProof = async (path: string) => {
+    const { data, error } = await supabase.storage.from('payment-proofs').createSignedUrl(path, 300);
+    if (error || !data) { toast.error('Failed to load proof'); return; }
+    setProofUrl(data.signedUrl);
+  };
+
   const statusStyle = (s: string) => {
     switch (s) {
-      case 'completed': return 'bg-primary/10 text-primary';
-      case 'processing': return 'bg-blue-50 text-blue-600';
-      case 'cancelled': return 'bg-red-50 text-red-600';
-      default: return 'bg-orange-50 text-orange-600';
+      case 'delivered': return 'bg-primary/10 text-primary';
+      case 'paid': return 'bg-emerald-50 text-emerald-700';
+      case 'packed':
+      case 'shipped': return 'bg-blue-50 text-blue-600';
+      case 'rejected': return 'bg-red-50 text-red-600';
+      default: return 'bg-orange-50 text-orange-600'; // pending_verification
     }
   };
 
+  const methodLabel = (m?: string | null) => {
+    if (m === 'jazzcash') return 'JazzCash';
+    if (m === 'bank_transfer') return 'Bank Transfer (UBL)';
+    return m || '—';
+  };
+
   return (
-    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 lg:p-8 space-y-4">
-      {orders?.map(order => (
-        <div key={order.id} className="border border-slate-100 rounded-2xl p-5 hover:border-primary/20 transition-all">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                {(order.customer_name || 'NA').slice(0, 2).toUpperCase()}
+    <>
+      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 lg:p-8 space-y-4">
+        {orders?.map((order: any) => (
+          <div key={order.id} className="border border-slate-100 rounded-2xl p-5 hover:border-primary/20 transition-all">
+            <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+                  {(order.customer_name || 'NA').slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-900 truncate">{order.customer_name || 'N/A'}</p>
+                  <p className="text-xs text-slate-400 truncate">{order.phone} · {new Date(order.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`hidden sm:inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusStyle(order.status)}`}>
+                  {order.status?.replace('_', ' ')}
+                </span>
+                <Select value={order.status} onValueChange={v => updateStatus(order.id, v)}>
+                  <SelectTrigger className="w-44 h-9 rounded-xl text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {ORDER_STATUSES.map(s => (
+                      <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Payment info */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-xl bg-slate-50 p-3 mb-3 text-xs">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Method</p>
+                <p className="font-semibold text-slate-800">{methodLabel(order.payment_method)}</p>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-slate-900 truncate">{order.customer_name || 'N/A'}</p>
-                <p className="text-xs text-slate-400 truncate">{order.phone} · {new Date(order.created_at).toLocaleDateString()}</p>
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Reference</p>
+                <p className="font-mono text-slate-800 truncate">{order.payment_reference || '—'}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Proof</p>
+                {order.payment_proof_path ? (
+                  <button onClick={() => viewProof(order.payment_proof_path)} className="text-primary font-semibold hover:underline">
+                    View screenshot
+                  </button>
+                ) : <span className="text-slate-400">—</span>}
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <span className={`hidden sm:inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusStyle(order.status)}`}>
-                {order.status}
-              </span>
-              <Select value={order.status} onValueChange={v => updateStatus(order.id, v)}>
-                <SelectTrigger className="w-32 h-9 rounded-xl text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">{t('pending')}</SelectItem>
-                  <SelectItem value="processing">{t('processing')}</SelectItem>
-                  <SelectItem value="completed">{t('completed')}</SelectItem>
-                  <SelectItem value="cancelled">{t('cancelled')}</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="text-xs space-y-1 pl-1">
+              {(order.order_items as any[])?.map((item: any) => (
+                <div key={item.id} className="flex justify-between text-slate-600">
+                  <span>{item.product_name} × {item.quantity}</span>
+                  <span className="font-medium text-slate-700">Rs. {(item.price_at_purchase * item.quantity).toLocaleString()}</span>
+                </div>
+              ))}
             </div>
+            <div className="border-t border-slate-100 mt-3 pt-3 flex justify-between text-sm font-bold">
+              <span className="text-slate-700">Total</span>
+              <span className="text-primary">Rs. {order.total_price.toLocaleString()}</span>
+            </div>
+            {order.address && <p className="text-xs text-slate-400 mt-2">📍 {order.address}</p>}
           </div>
-          <div className="text-xs space-y-1 pl-1">
-            {(order.order_items as any[])?.map((item: any) => (
-              <div key={item.id} className="flex justify-between text-slate-600">
-                <span>{item.product_name} × {item.quantity}</span>
-                <span className="font-medium text-slate-700">Rs. {(item.price_at_purchase * item.quantity).toLocaleString()}</span>
-              </div>
-            ))}
+        ))}
+        {(!orders || orders.length === 0) && (
+          <p className="text-center text-slate-400 py-12">No orders yet</p>
+        )}
+      </div>
+
+      {proofUrl && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setProofUrl(null)}>
+          <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setProofUrl(null)} className="absolute -top-10 right-0 text-white hover:text-white/70">
+              <X className="w-6 h-6" />
+            </button>
+            <img src={proofUrl} alt="Payment proof" className="max-w-full max-h-[90vh] rounded-lg" />
           </div>
-          <div className="border-t border-slate-100 mt-3 pt-3 flex justify-between text-sm font-bold">
-            <span className="text-slate-700">{t('total')}</span>
-            <span className="text-primary">Rs. {order.total_price.toLocaleString()}</span>
-          </div>
-          {order.address && <p className="text-xs text-slate-400 mt-2">📍 {order.address}</p>}
         </div>
-      ))}
-      {(!orders || orders.length === 0) && (
-        <p className="text-center text-slate-400 py-12">No orders yet</p>
       )}
-    </div>
+    </>
   );
 };
+
 
 const CategoriesManagement = () => {
   const queryClient = useQueryClient();

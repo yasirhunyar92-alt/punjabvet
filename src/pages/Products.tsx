@@ -19,14 +19,17 @@ const Products = () => {
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get('category');
+  const animalFilter = searchParams.get('animal');
+  const offersFilter = searchParams.get('offers');
   const [sortBy, setSortBy] = useState('newest');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || 'all');
-  const [selectedAnimal, setSelectedAnimal] = useState<string>('all');
+  const [selectedAnimal, setSelectedAnimal] = useState<string>(animalFilter || 'all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [priceMin, setPriceMin] = useState<string>('');
   const [priceMax, setPriceMax] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
+  const [onlyOffers, setOnlyOffers] = useState<boolean>(!!offersFilter);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -78,6 +81,9 @@ const Products = () => {
     // Tag
     if (selectedTag !== 'all') result = result.filter(p => (p.tags || []).includes(selectedTag));
 
+    // Offers only
+    if (onlyOffers) result = result.filter(p => p.discount_price && p.discount_price < p.price);
+
     // Price range
     const min = parseFloat(priceMin);
     const max = parseFloat(priceMax);
@@ -89,12 +95,12 @@ const Products = () => {
     else if (sortBy === 'price-high') result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [products, searchQuery, selectedCategory, selectedAnimal, selectedTag, sortBy, priceMin, priceMax]);
+  }, [products, searchQuery, selectedCategory, selectedAnimal, selectedTag, sortBy, priceMin, priceMax, onlyOffers]);
 
-  const hasActiveFilters = selectedCategory !== 'all' || selectedAnimal !== 'all' || selectedTag !== 'all' || searchQuery.trim() || priceMin || priceMax;
+  const hasActiveFilters = selectedCategory !== 'all' || selectedAnimal !== 'all' || selectedTag !== 'all' || searchQuery.trim() || priceMin || priceMax || onlyOffers;
 
   const clearFilters = () => {
-    setSelectedCategory('all'); setSelectedAnimal('all'); setSelectedTag('all'); setSearchQuery(''); setPriceMin(''); setPriceMax('');
+    setSelectedCategory('all'); setSelectedAnimal('all'); setSelectedTag('all'); setSearchQuery(''); setPriceMin(''); setPriceMax(''); setOnlyOffers(false);
   };
 
   return (
