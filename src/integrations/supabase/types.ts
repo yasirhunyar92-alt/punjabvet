@@ -297,6 +297,63 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          new_products: boolean
+          order_updates: boolean
+          promotions: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          new_products?: boolean
+          order_updates?: boolean
+          promotions?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          new_products?: boolean
+          order_updates?: boolean
+          promotions?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -348,6 +405,9 @@ export type Database = {
           created_at: string
           customer_name: string | null
           id: string
+          payment_method: string | null
+          payment_proof_path: string | null
+          payment_reference: string | null
           phone: string | null
           status: string
           total_price: number
@@ -359,6 +419,9 @@ export type Database = {
           created_at?: string
           customer_name?: string | null
           id?: string
+          payment_method?: string | null
+          payment_proof_path?: string | null
+          payment_reference?: string | null
           phone?: string | null
           status?: string
           total_price?: number
@@ -370,6 +433,9 @@ export type Database = {
           created_at?: string
           customer_name?: string | null
           id?: string
+          payment_method?: string | null
+          payment_proof_path?: string | null
+          payment_reference?: string | null
           phone?: string | null
           status?: string
           total_price?: number
