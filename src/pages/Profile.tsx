@@ -81,21 +81,27 @@ const Profile = () => {
   };
 
   const statusColors: Record<string, string> = {
+    pending_verification: 'bg-warning text-foreground',
     pending: 'bg-warning text-foreground',
-    processing: 'bg-primary/20 text-primary',
+    paid: 'bg-emerald-100 text-emerald-700',
+    packed: 'bg-blue-100 text-blue-700',
+    shipped: 'bg-primary/20 text-primary',
+    delivered: 'bg-accent text-accent-foreground',
     completed: 'bg-accent text-accent-foreground',
+    rejected: 'bg-destructive/20 text-destructive',
     cancelled: 'bg-destructive/20 text-destructive',
   };
 
   const trackingSteps: { key: string; label: string; labelUr: string; icon: any }[] = [
-    { key: 'pending', label: 'Order Placed', labelUr: 'آرڈر موصول', icon: ClipboardList },
-    { key: 'processing', label: 'Preparing', labelUr: 'تیاری میں', icon: Package },
-    { key: 'shipped', label: 'Out for Delivery', labelUr: 'ڈیلیوری کے لیے روانہ', icon: Truck },
-    { key: 'completed', label: 'Delivered', labelUr: 'ڈیلیور ہو گیا', icon: CheckCircle2 },
+    { key: 'pending_verification', label: 'Payment Review', labelUr: 'ادائیگی زیر تصدیق', icon: ClipboardList },
+    { key: 'paid', label: 'Payment Verified', labelUr: 'ادائیگی تصدیق شدہ', icon: CheckCircle2 },
+    { key: 'packed', label: 'Packed', labelUr: 'تیار', icon: Package },
+    { key: 'shipped', label: 'Out for Delivery', labelUr: 'روانہ', icon: Truck },
+    { key: 'delivered', label: 'Delivered', labelUr: 'ڈیلیور', icon: CheckCircle2 },
   ];
 
   const stepIndex = (status: string) => {
-    const map: Record<string, number> = { pending: 0, processing: 1, shipped: 2, completed: 3, cancelled: -1 };
+    const map: Record<string, number> = { pending_verification: 0, pending: 0, paid: 1, packed: 2, shipped: 3, delivered: 4, completed: 4, rejected: -1, cancelled: -1 };
     return map[status] ?? 0;
   };
 
@@ -179,11 +185,11 @@ const Profile = () => {
                       <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
                     </div>
                     <Badge className={statusColors[order.status] || ''}>
-                      {t(order.status as any) || order.status}
+                      {(order.status || '').replace('_', ' ')}
                     </Badge>
                   </div>
 
-                  {order.status !== 'cancelled' && (
+                  {!['cancelled', 'rejected'].includes(order.status) && (
                     <div className="mb-4 rounded-md bg-muted/40 p-3">
                       <div className="flex items-center justify-between">
                         {trackingSteps.map((step, i) => {
