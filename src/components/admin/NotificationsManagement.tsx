@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Send, Bell } from 'lucide-react';
@@ -21,9 +20,16 @@ const schema = z.object({
 const NotificationsManagement = () => {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({ title: '', body: '', type: 'promo', link: '' });
-  const [target, setTarget] = useState<'all' | 'user'>('all');
-  const [targetEmail, setTargetEmail] = useState('');
+  const [targetUserId, setTargetUserId] = useState<string>('all');
   const [sending, setSending] = useState(false);
+
+  const { data: customers = [] } = useQuery({
+    queryKey: ['admin-customers-mini'],
+    queryFn: async () => {
+      const { data } = await supabase.from('profiles').select('id, name, phone').order('created_at', { ascending: false }).limit(500);
+      return data || [];
+    },
+  });
 
   const { data: recent = [] } = useQuery({
     queryKey: ['admin-recent-notifications'],
@@ -45,26 +51,7 @@ const NotificationsManagement = () => {
     }
     setSending(true);
     try {
-      let userId: string | null = null;
-      if (target === 'user') {
-        if (!targetEmail.trim()) {
-          toast.error('Enter a customer email');
-          setSending(false);
-          return;
-        }
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', targetEmail.trim().toLowerCase())
-          .maybeSingle();
-        if (!profile) {
-          toast.error('No customer found with that email');
-          setSending(false);
-          return;
-        }
-        userId = profile.id;
-      }
-
+      const userId = targetUserId === 'all' ? null : targetUserId;
       const { error } = await supabase.from('notifications').insert({
         user_id: userId,
         title: parsed.data.title,
@@ -73,9 +60,9 @@ const NotificationsManagement = () => {
         link: parsed.data.link || null,
       });
       if (error) throw error;
-      toast.success(target === 'all' ? 'Broadcast sent' : 'Notification sent');
+      toast.success(userId ? 'Notification sent' : 'Broadcast sent');
       setForm({ title: '', body: '', type: 'promo', link: '' });
-      setTargetEmail('');
+      setTargetUserId('all');
       queryClient.invalidateQueries({ queryKey: ['admin-recent-notifications'] });
     } catch (e: any) {
       toast.error(e.message || 'Failed to send');
