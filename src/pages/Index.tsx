@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ProductCard from '@/components/ProductCard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import heroBanner from '@/assets/hero-banner.jpg';
+import heroBanner from '@/assets/hero-vet.jpg';
 import medicinesImg from '@/assets/medicines-category.jpg';
 import vaccinesImg from '@/assets/vaccines-category.jpg';
 import supplementsImg from '@/assets/supplements-category.jpg';
@@ -51,8 +51,8 @@ const Index = () => {
     <div className="min-h-screen bg-muted/30">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-96 object-cover" width={1920} height={800} />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent" />
+        <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-[28rem] object-cover" width={1600} height={912} fetchPriority="high" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="container">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="max-w-lg">

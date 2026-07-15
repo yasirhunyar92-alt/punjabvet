@@ -3,7 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart, AlertCircle } from 'lucide-react';
 
 const Cart = () => {
   const { t, isUrdu } = useLanguage();
@@ -36,7 +36,17 @@ const Cart = () => {
 
   return (
     <div className="container py-6">
-      <h1 className={`text-2xl font-bold text-foreground mb-6 ${fontClass}`}>{t('yourCart')}</h1>
+      <h1 className={`text-2xl font-bold text-foreground mb-4 ${fontClass}`}>{t('yourCart')}</h1>
+
+      <div className="bg-destructive/5 border border-destructive/30 rounded-lg p-3 mb-6 flex items-start gap-2.5">
+        <AlertCircle size={18} className="text-destructive flex-shrink-0 mt-0.5" />
+        <p className={`text-xs text-foreground ${fontClass}`}>
+          {isUrdu
+            ? 'کیش آن ڈیلیوری دستیاب نہیں ہے۔ تمام آرڈرز کے لیے 100% پیشگی ادائیگی ضروری ہے۔'
+            : 'Cash on Delivery is not available. All orders require 100% advance payment.'}
+        </p>
+      </div>
+
 
       <div className="space-y-4">
         {items.map(item => (
