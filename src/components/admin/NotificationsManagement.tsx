@@ -107,25 +107,20 @@ const NotificationsManagement = () => {
           </div>
 
           <div>
-            <Label className="mb-2 block">Send to</Label>
-            <RadioGroup value={target} onValueChange={(v) => setTarget(v as 'all' | 'user')} className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <RadioGroupItem value="all" id="all" /> <span>All customers</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <RadioGroupItem value="user" id="user" /> <span>Specific customer</span>
-              </label>
-            </RadioGroup>
-            {target === 'user' && (
-              <Input
-                className="mt-3"
-                type="email"
-                value={targetEmail}
-                onChange={(e) => setTargetEmail(e.target.value)}
-                placeholder="customer@example.com"
-              />
-            )}
+            <Label>Send to</Label>
+            <Select value={targetUserId} onValueChange={setTargetUserId}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All customers (broadcast)</SelectItem>
+                {customers.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name || 'Unnamed'}{c.phone ? ` — ${c.phone}` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
 
           <Button onClick={send} disabled={sending} className="w-full sm:w-auto">
             <Send size={16} className="mr-2" />
