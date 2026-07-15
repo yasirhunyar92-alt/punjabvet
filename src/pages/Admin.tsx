@@ -21,10 +21,11 @@ import BulkImageUpload from '@/components/admin/BulkImageUpload';
 import AiBulkImport from '@/components/admin/AiBulkImport';
 import AiProductImporter from '@/components/admin/AiProductImporter';
 import SiteImagesManagement from '@/components/admin/SiteImagesManagement';
+import NotificationsManagement from '@/components/admin/NotificationsManagement';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -51,6 +52,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
     items: [
       { id: 'banners', label: 'Banners', icon: ImageIcon },
       { id: 'site-images', label: 'Site Images', icon: ImageIcon },
+      { id: 'notifications', label: 'Notifications', icon: Bell },
       { id: 'blog', label: 'Blog', icon: FileText },
     ],
   },
@@ -69,6 +71,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   'ai-bulk': { title: 'AI Bulk Product Import', subtitle: 'Enter names — AI fills all fields and saves' },
   'ai-importer': { title: 'AI Product Importer', subtitle: 'Import from name, URL, image, or PDF with preview & edit' },
   'site-images': { title: 'Site Images', subtitle: 'Manage homepage hero, services, and categories background images' },
+  notifications: { title: 'Notifications', subtitle: 'Send announcements and promotional alerts to customers' },
 };
 
 const Admin = () => {
@@ -116,6 +119,7 @@ const Admin = () => {
       case 'ai-bulk': return <AiBulkImport />;
       case 'ai-importer': return <AiProductImporter />;
       case 'site-images': return <SiteImagesManagement />;
+      case 'notifications': return <NotificationsManagement />;
     }
   };
 
