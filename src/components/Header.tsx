@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Search, Globe, ChevronDown, PackageSearch } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Globe, ChevronDown, PackageSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import SmartSearch from '@/components/SmartSearch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -34,7 +34,6 @@ const Header = () => {
   const { user, isAdmin, signOut, loading: authLoading } = useAuth();
   const { totalItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   const { data: categories = [] } = useQuery({
@@ -45,14 +44,6 @@ const Header = () => {
     },
     staleTime: 5 * 60_000,
   });
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-    }
-  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -84,17 +75,9 @@ const Header = () => {
           </div>
         </Link>
 
-        <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-auto hidden sm:flex">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('search')}
-              className={`pl-10 ${isUrdu ? 'font-urdu text-right' : ''}`}
-            />
-          </div>
-        </form>
+        <div className="flex-1 max-w-xl mx-auto hidden sm:block">
+          <SmartSearch />
+        </div>
 
         <div className="flex items-center gap-1 ml-auto">
           <Button
@@ -138,17 +121,7 @@ const Header = () => {
       </div>
 
       <div className="sm:hidden px-4 pb-3">
-        <form onSubmit={handleSearch}>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('search')}
-              className={`pl-10 ${isUrdu ? 'font-urdu text-right' : ''}`}
-            />
-          </div>
-        </form>
+        <SmartSearch />
       </div>
 
       {menuOpen && (
