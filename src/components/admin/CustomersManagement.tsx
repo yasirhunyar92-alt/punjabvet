@@ -3,12 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Mail, Phone, MapPin, ShoppingBag, X, User } from 'lucide-react';
+import { Search, Phone, MapPin, ShoppingBag, X, User } from 'lucide-react';
 
 type Profile = {
   id: string;
   name: string | null;
-  email: string | null;
   phone: string | null;
   address: string | null;
   created_at: string;
@@ -31,7 +30,7 @@ const CustomersManagement = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('id, name, email, phone, address, created_at')
+        .select('id, name, phone, address, created_at')
         .order('created_at', { ascending: false });
       return (data || []) as Profile[];
     },
@@ -64,7 +63,6 @@ const CustomersManagement = () => {
     if (!q) return profiles;
     return profiles.filter(p =>
       (p.name || '').toLowerCase().includes(q) ||
-      (p.email || '').toLowerCase().includes(q) ||
       (p.phone || '').toLowerCase().includes(q) ||
       (p.address || '').toLowerCase().includes(q)
     );
