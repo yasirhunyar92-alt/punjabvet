@@ -22,9 +22,10 @@ import AiBulkImport from '@/components/admin/AiBulkImport';
 import AiProductImporter from '@/components/admin/AiProductImporter';
 import SiteImagesManagement from '@/components/admin/SiteImagesManagement';
 import NotificationsManagement from '@/components/admin/NotificationsManagement';
+import CustomersManagement from '@/components/admin/CustomersManagement';
 
 type SectionId =
-  | 'analytics' | 'products' | 'orders' | 'categories'
+  | 'analytics' | 'products' | 'orders' | 'customers' | 'categories'
   | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
@@ -34,6 +35,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
       { id: 'analytics', label: 'Analytics', icon: LayoutDashboard },
       { id: 'products', label: 'Products', icon: Package },
       { id: 'orders', label: 'Orders', icon: ShoppingCart, badge: 'pending-orders' },
+      { id: 'customers', label: 'Customers', icon: Users },
     ],
   },
   {
@@ -62,6 +64,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   analytics: { title: 'Analytics', subtitle: 'Store performance at a glance' },
   products: { title: 'Products', subtitle: 'Manage your medicine catalog' },
   orders: { title: 'Orders', subtitle: 'Track and update customer orders' },
+  customers: { title: 'Customers', subtitle: 'Every registered customer with their order history' },
   categories: { title: 'Categories', subtitle: 'Organize your product taxonomy' },
   coupons: { title: 'Coupons', subtitle: 'Run discounts and promotions' },
   banners: { title: 'Banners', subtitle: 'Update homepage promotional banners' },
@@ -110,6 +113,7 @@ const Admin = () => {
       case 'analytics': return <AnalyticsDashboard />;
       case 'products': return <ProductsManagement />;
       case 'orders': return <OrdersManagement />;
+      case 'customers': return <CustomersManagement />;
       case 'categories': return <CategoriesManagement />;
       case 'coupons': return <CouponsManagement />;
       case 'banners': return <BannersManagement />;
