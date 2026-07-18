@@ -99,11 +99,11 @@ const CustomersManagement = () => {
                 className="text-left border border-slate-100 rounded-2xl p-4 hover:border-primary/30 hover:shadow-md transition-all bg-white">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                    {(p.name || p.email || 'NA').slice(0, 2).toUpperCase()}
+                    {(p.name || 'NA').slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-slate-900 truncate">{p.name || 'Unnamed'}</p>
-                    <p className="text-xs text-slate-500 truncate">{p.email || '—'}</p>
+                    <p className="text-xs text-slate-500 truncate">{p.phone || '—'}</p>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
@@ -129,7 +129,7 @@ const CustomersManagement = () => {
             <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
-                  {(selected.name || selected.email || 'NA').slice(0, 2).toUpperCase()}
+                  {(selected.name || 'NA').slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-bold text-slate-900 truncate">{selected.name || 'Unnamed customer'}</h3>
@@ -140,9 +140,10 @@ const CustomersManagement = () => {
             </div>
 
             <div className="p-6 space-y-3">
-              <InfoRow icon={Mail} label="Email" value={selected.email} />
               <InfoRow icon={Phone} label="Phone" value={selected.phone} />
               <InfoRow icon={MapPin} label="Address" value={selected.address} />
+              <InfoRow icon={User} label="User ID" value={selected.id} />
+
 
               <div className="pt-3 border-t border-slate-100">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
@@ -175,10 +176,8 @@ const CustomersManagement = () => {
                   <Button variant="outline" className="w-full rounded-xl">WhatsApp</Button>
                 </a>
               )}
-              {selected.email && (
-                <a href={`mailto:${selected.email}`} className="flex-1">
-                  <Button variant="outline" className="w-full rounded-xl">Email</Button>
-                </a>
+              {!selected.phone && !selected.address && (
+                <p className="text-xs text-slate-400 flex-1 text-center py-2">No contact info</p>
               )}
             </div>
           </div>
