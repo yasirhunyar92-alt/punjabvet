@@ -8,10 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Truck, Tag, X, Copy, Upload, Check, AlertCircle, Landmark, Smartphone } from 'lucide-react';
+import { Tag, X, Copy, Upload, Check, AlertCircle, Landmark, Smartphone } from 'lucide-react';
 import { z } from 'zod';
-
-const TCS_CHARGES = 250;
 
 const PAYMENT_METHODS = [
   {
@@ -65,7 +63,7 @@ const Checkout = () => {
 
   const subtotal = totalPrice;
   const discount = coupon?.discount || 0;
-  const grandTotal = Math.max(0, subtotal - discount) + TCS_CHARGES;
+  const grandTotal = Math.max(0, subtotal - discount);
 
   const copyToClipboard = (value: string, label: string) => {
     navigator.clipboard.writeText(value);
@@ -223,13 +221,8 @@ const Checkout = () => {
               <span>− {t('rs')} {discount.toLocaleString()}</span>
             </div>
           )}
-          <div className="flex justify-between">
-            <span className="text-muted-foreground flex items-center gap-1">
-              <Truck size={14} /> {isUrdu ? 'TCS ڈیلیوری چارجز' : 'TCS Delivery'}
-            </span>
-            <span>{t('rs')} {TCS_CHARGES.toLocaleString()}</span>
-          </div>
           <div className="border-t pt-2 flex justify-between font-bold text-base">
+
             <span className={fontClass}>{isUrdu ? 'کل رقم' : 'Grand Total'}</span>
             <span className="text-primary">{t('rs')} {grandTotal.toLocaleString()}</span>
           </div>
