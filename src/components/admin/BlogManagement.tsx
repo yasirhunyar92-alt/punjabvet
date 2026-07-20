@@ -81,7 +81,7 @@ const BlogManagement = () => {
         seo_description: p.seo_description || p.excerpt || '',
         category: p.category || 'General',
         tags: Array.isArray(p.tags) ? p.tags.join(', ') : '',
-        cover_image: '',
+        cover_image: p.cover_image || '',
         published: false,
         ai_generated: true,
       });
