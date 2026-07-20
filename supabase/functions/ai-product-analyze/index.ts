@@ -16,7 +16,7 @@ serve(async (req) => {
     if (!imageUrl) throw new Error("imageUrl is required");
 
     if (action === "remove-bg") {
-      // Use image model to remove background and make professional
+      // Use Gemini image model via images generation endpoint for reliability
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -29,7 +29,7 @@ serve(async (req) => {
             {
               role: "user",
               content: [
-                { type: "text", text: "Remove the background from this product image completely. Make it a clean, professional product photo with a pure white background. Keep the product sharp and well-lit. Return only the edited image." },
+                { type: "text", text: "Remove the background from this product completely and replace it with a clean pure white studio background. Keep the product sharp, well-lit, centered, and photorealistic. Output only the edited image." },
                 { type: "image_url", image_url: { url: imageUrl } },
               ],
             },
@@ -47,8 +47,21 @@ serve(async (req) => {
       }
 
       const data = await response.json();
-      const editedImage = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-      
+      const msg = data.choices?.[0]?.message ?? {};
+      // Try several known response shapes
+      let editedImage: string | undefined =
+        msg.images?.[0]?.image_url?.url ||
+        msg.images?.[0]?.url ||
+        (Array.isArray(msg.content) ? msg.content.find((c: any) => c?.image_url?.url)?.image_url?.url : undefined);
+
+      if (!editedImage) {
+        console.error("No image in response:", JSON.stringify(data).slice(0, 500));
+        return new Response(JSON.stringify({ error: "AI did not return an image. Try a clearer photo." }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Ensure data URL prefix
+      if (!editedImage.startsWith("data:")) editedImage = `data:image/png;base64,${editedImage}`;
+
       return new Response(JSON.stringify({ editedImage }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
