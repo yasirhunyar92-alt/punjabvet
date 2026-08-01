@@ -70,7 +70,7 @@ serve(async (req) => {
       throw new GeminiError("Provide productName, productUrl, imageBase64, or pdfBase64", 400);
     }
 
-    const raw = await geminiText({ model: "gemini-2.5-pro", system: SYSTEM_PROMPT, parts, json: true });
+    const raw = await geminiText({ model: "gemini-3-pro-preview", system: SYSTEM_PROMPT, parts, json: true });
 
     return new Response(JSON.stringify({ product: parseJson(raw) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
