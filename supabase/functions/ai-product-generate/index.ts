@@ -1,9 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { corsHeaders, geminiText, GeminiError, jsonError, parseJson, type GeminiPart } from "../_shared/gemini.ts";
 
 const SYSTEM_PROMPT = `You are an expert veterinary pharmaceutical database for Pakistan. Given a veterinary medicine or livestock product (by name, URL, image, or PDF), return authentic, accurate details. Use your knowledge of Pakistani and international veterinary brands (Selmox, Tygent, Ketoject, Oxytetracycline, Ivermectin brands, Star Laboratories, ICI, Selmore, Vetnex, Hi-Tech, Farvet, Wan-Bury, MSD, Zoetis, Elanco, etc.). Never fabricate a fake manufacturer. Output STRICT JSON only.`;
 
@@ -49,73 +45,39 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    const { productName, productUrl, imageBase64, imageMime, pdfBase64, pdfName, existingCategories } = await req.json();
+    const { productName, productUrl, imageBase64, imageMime, pdfBase64, existingCategories } = await req.json();
 
     const categoryHints: string[] = Array.isArray(existingCategories) ? existingCategories : [];
-
-    let userContent: any;
     const instr = buildUserInstruction(categoryHints);
 
+    let parts: GeminiPart[];
+
     if (imageBase64) {
-      const mime = imageMime || "image/jpeg";
-      userContent = [
-        { type: "text", text: `Identify this veterinary product from the image and generate a complete listing.\n\n${instr}` },
-        { type: "image_url", image_url: { url: `data:${mime};base64,${imageBase64}` } },
+      parts = [
+        { text: `Identify this veterinary product from the image and generate a complete listing.\n\n${instr}` },
+        { inline_data: { mime_type: imageMime || "image/jpeg", data: imageBase64 } },
       ];
     } else if (pdfBase64) {
-      userContent = [
-        { type: "text", text: `Extract the veterinary product details from this PDF and generate a complete listing.\n\n${instr}` },
-        { type: "file", file: { filename: pdfName || "catalog.pdf", file_data: `data:application/pdf;base64,${pdfBase64}` } },
+      parts = [
+        { text: `Extract the veterinary product details from this PDF and generate a complete listing.\n\n${instr}` },
+        { inline_data: { mime_type: "application/pdf", data: pdfBase64 } },
       ];
     } else if (productUrl) {
-      userContent = `Research this product page and generate a complete listing.\nURL: ${productUrl}\n\n${instr}`;
+      parts = [{ text: `Research this product page and generate a complete listing.\nURL: ${productUrl}\n\n${instr}` }];
     } else if (productName) {
-      userContent = `Generate a complete product listing for: "${productName}".\n\n${instr}`;
+      parts = [{ text: `Generate a complete product listing for: "${productName}".\n\n${instr}` }];
     } else {
-      throw new Error("Provide productName, productUrl, imageBase64, or pdfBase64");
+      throw new GeminiError("Provide productName, productUrl, imageBase64, or pdfBase64", 400);
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+    const raw = await geminiText({ model: "gemini-2.5-pro", system: SYSTEM_PROMPT, parts, json: true });
 
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("AI error:", response.status, t);
-      if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limited, try again shortly" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits in Settings → Plans & credits." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("Generation failed");
-    }
-
-    const data = await response.json();
-    const raw = data.choices?.[0]?.message?.content ?? "{}";
-    let product: Record<string, unknown> = {};
-    try { product = JSON.parse(raw); } catch {
-      const m = raw.match(/\{[\s\S]*\}/);
-      product = m ? JSON.parse(m[0]) : {};
-    }
-
-    return new Response(JSON.stringify({ product }), {
+    return new Response(JSON.stringify({ product: parseJson(raw) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    console.error("ai-product-generate error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const status = err instanceof GeminiError ? err.status : 500;
+    console.error("ai-product-generate error:", err);
+    return jsonError(err instanceof Error ? err.message : "Unknown error", status);
   }
 });
