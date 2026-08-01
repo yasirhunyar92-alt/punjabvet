@@ -655,6 +655,48 @@ export type Database = {
         }
         Relationships: []
       }
+      site_themes: {
+        Row: {
+          banner_text: string | null
+          banner_text_ur: string | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          name: string
+          occasion: string | null
+          starts_at: string | null
+          tokens: Json
+          updated_at: string
+        }
+        Insert: {
+          banner_text?: string | null
+          banner_text_ur?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          occasion?: string | null
+          starts_at?: string | null
+          tokens?: Json
+          updated_at?: string
+        }
+        Update: {
+          banner_text?: string | null
+          banner_text_ur?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          occasion?: string | null
+          starts_at?: string | null
+          tokens?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

@@ -6,7 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Header from "@/components/Header";
+import FestiveBanner from "@/components/FestiveBanner";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -42,7 +44,9 @@ const App = () => (
         <LanguageProvider>
           <AuthProvider>
             <CartProvider>
+             <ThemeProvider>
               <div className="flex flex-col min-h-screen">
+                <FestiveBanner />
                 <Header />
                 <main className="flex-1">
                   <Routes>
@@ -69,7 +73,9 @@ const App = () => (
                 <Footer />
                 <WhatsAppButton />
               </div>
+             </ThemeProvider>
             </CartProvider>
+
           </AuthProvider>
         </LanguageProvider>
       </BrowserRouter>
