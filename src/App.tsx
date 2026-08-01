@@ -73,7 +73,9 @@ const App = () => (
                 <Footer />
                 <WhatsAppButton />
               </div>
+             </ThemeProvider>
             </CartProvider>
+
           </AuthProvider>
         </LanguageProvider>
       </BrowserRouter>
