@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Trash2, Package, ShoppingCart, Users, TrendingUp, Tag, Image as ImageIcon,
-  FileText, Upload, LayoutDashboard, FolderTree, Bell, Search, Stethoscope, Menu, X, Sparkles,
+  FileText, Upload, LayoutDashboard, FolderTree, Bell, Search, Stethoscope, Menu, X, Sparkles, Palette,
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CouponsManagement from '@/components/admin/CouponsManagement';
