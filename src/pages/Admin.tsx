@@ -23,10 +23,11 @@ import AiProductImporter from '@/components/admin/AiProductImporter';
 import SiteImagesManagement from '@/components/admin/SiteImagesManagement';
 import NotificationsManagement from '@/components/admin/NotificationsManagement';
 import CustomersManagement from '@/components/admin/CustomersManagement';
+import ThemeManagement from '@/components/admin/ThemeManagement';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'customers' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications' | 'themes';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -56,6 +57,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
       { id: 'site-images', label: 'Site Images', icon: ImageIcon },
       { id: 'notifications', label: 'Notifications', icon: Bell },
       { id: 'blog', label: 'Blog', icon: FileText },
+      { id: 'themes', label: 'AI Theme Changer', icon: Palette },
     ],
   },
 ];
@@ -73,6 +75,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   'bulk-photos': { title: 'Bulk Upload Products', subtitle: 'AI scans product photos and creates listings automatically' },
   'ai-bulk': { title: 'AI Bulk Product Import', subtitle: 'Enter names — AI fills all fields and saves' },
   'ai-importer': { title: 'AI Product Importer', subtitle: 'Import from name, URL, image, or PDF with preview & edit' },
+  themes: { title: 'AI Theme Changer', subtitle: 'Generate festive website themes for 14 August, Eid and seasonal offers' },
   'site-images': { title: 'Site Images', subtitle: 'Manage homepage hero, services, and categories background images' },
   notifications: { title: 'Notifications', subtitle: 'Send announcements and promotional alerts to customers' },
 };
@@ -123,6 +126,7 @@ const Admin = () => {
       case 'ai-bulk': return <AiBulkImport />;
       case 'ai-importer': return <AiProductImporter />;
       case 'site-images': return <SiteImagesManagement />;
+      case 'themes': return <ThemeManagement />;
       case 'notifications': return <NotificationsManagement />;
     }
   };
