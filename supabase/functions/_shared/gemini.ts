@@ -87,29 +87,73 @@ export function parseJson<T = Record<string, any>>(raw: string): T {
 }
 
 /**
- * Generate or edit an image. Returns a data URL, or undefined if the model
- * returned no image.
+ * Generate or edit an image. Returns a data URL, or undefined if no image was
+ * produced. Image models are not available on every Gemini API plan, so this
+ * transparently falls back to the Lovable AI image model when the Gemini key
+ * has no image quota.
  */
 export async function geminiImage(opts: {
   parts: GeminiPart[];
   model?: string;
 }): Promise<string | undefined> {
-  const data = await callGemini(opts.model ?? "gemini-2.5-flash-image", {
-    contents: [{ role: "user", parts: opts.parts }],
-    generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+  try {
+    const data = await callGemini(opts.model ?? "gemini-2.5-flash-image", {
+      contents: [{ role: "user", parts: opts.parts }],
+      generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+    });
+
+    const parts = data?.candidates?.[0]?.content?.parts ?? [];
+    for (const p of parts) {
+      const inline = p?.inlineData ?? p?.inline_data;
+      if (inline?.data) {
+        const mime = inline.mimeType ?? inline.mime_type ?? "image/png";
+        return `data:${mime};base64,${inline.data}`;
+      }
+    }
+    console.error("No image part in Gemini response:", JSON.stringify(data).slice(0, 400));
+  } catch (e) {
+    console.error("Gemini image failed, trying fallback:", e instanceof Error ? e.message : e);
+  }
+
+  return await fallbackImage(opts.parts);
+}
+
+/** Lovable AI image fallback (used when the Gemini key has no image quota). */
+async function fallbackImage(parts: GeminiPart[]): Promise<string | undefined> {
+  const key = Deno.env.get("LOVABLE_API_KEY");
+  if (!key) return undefined;
+
+  const content = parts.map((p: any) =>
+    "text" in p
+      ? { type: "text", text: p.text }
+      : { type: "image_url", image_url: { url: `data:${p.inline_data.mime_type};base64,${p.inline_data.data}` } }
+  );
+
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash-image",
+      messages: [{ role: "user", content }],
+      modalities: ["image", "text"],
+    }),
   });
 
-  const parts = data?.candidates?.[0]?.content?.parts ?? [];
-  for (const p of parts) {
-    const inline = p?.inlineData ?? p?.inline_data;
-    if (inline?.data) {
-      const mime = inline.mimeType ?? inline.mime_type ?? "image/png";
-      return `data:${mime};base64,${inline.data}`;
-    }
+  if (!res.ok) {
+    console.error("fallback image error:", res.status, (await res.text()).slice(0, 300));
+    return undefined;
   }
-  console.error("No image part in Gemini response:", JSON.stringify(data).slice(0, 400));
-  return undefined;
+
+  const data = await res.json();
+  const msg = data.choices?.[0]?.message ?? {};
+  let url: string | undefined =
+    msg.images?.[0]?.image_url?.url ||
+    msg.images?.[0]?.url ||
+    (Array.isArray(msg.content) ? msg.content.find((c: any) => c?.image_url?.url)?.image_url?.url : undefined);
+  if (url && !url.startsWith("data:")) url = `data:image/png;base64,${url}`;
+  return url;
 }
+
 
 /** Fetch a remote image (or pass through a data URL) as inline Gemini data. */
 export async function toInlineImage(url: string): Promise<GeminiPart> {
