@@ -94,7 +94,7 @@ export async function geminiImage(opts: {
   parts: GeminiPart[];
   model?: string;
 }): Promise<string | undefined> {
-  const data = await callGemini(opts.model ?? "gemini-3.1-flash-image", {
+  const data = await callGemini(opts.model ?? "gemini-2.5-flash-image", {
     contents: [{ role: "user", parts: opts.parts }],
     generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
   });
