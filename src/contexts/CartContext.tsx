@@ -48,7 +48,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     const { data } = await supabase
       .from('cart_items')
-      .select('id, product_id, quantity, products(id, name, name_ur, price, image_url)')
+      .select('id, product_id, quantity, products(id, name, name_ur, price, discount_price, image_url)')
       .eq('user_id', user.id);
     
     if (data) {
@@ -93,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0);
+  const totalPrice = items.reduce((sum, i) => sum + effectivePrice(i.product) * i.quantity, 0);
 
   return (
     <CartContext.Provider value={{ items, loading, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>
