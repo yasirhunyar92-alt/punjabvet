@@ -12,9 +12,17 @@ interface CartItem {
     name: string;
     name_ur: string | null;
     price: number;
+    discount_price: number | null;
     image_url: string | null;
   };
 }
+
+/** Price the customer actually pays — discounted price wins when valid. */
+export const effectivePrice = (product?: { price: number; discount_price?: number | null } | null) => {
+  if (!product) return 0;
+  const dp = product.discount_price;
+  return dp != null && dp > 0 && dp < product.price ? Number(dp) : Number(product.price);
+};
 
 interface CartContextType {
   items: CartItem[];
@@ -26,6 +34,7 @@ interface CartContextType {
   totalItems: number;
   totalPrice: number;
 }
+
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
