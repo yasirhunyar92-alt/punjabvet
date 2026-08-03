@@ -13,7 +13,7 @@ interface SEOHeadProps {
 const SEOHead = ({ title, description, keywords, image, url, type = 'website', jsonLd }: SEOHeadProps) => {
   const siteName = 'Punjab Veterinary Medical Store';
   const defaultDesc = 'Quality veterinary medicines, vaccines & dairy supplements in Sillanwali. Call 03065757283 — trusted by local farmers & pet owners.';
-  const baseUrl = 'https://punjabvet.lovable.app';
+  const baseUrl = 'https://punjabveterinary.com';
 
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Vet Medicines & Vaccines – Sillanwali`;
   const metaDesc = description || defaultDesc;
@@ -33,6 +33,7 @@ const SEOHead = ({ title, description, keywords, image, url, type = 'website', j
       <meta property="og:site_name" content={siteName} />
       {image && <meta property="og:image" content={image} />}
 
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDesc} />

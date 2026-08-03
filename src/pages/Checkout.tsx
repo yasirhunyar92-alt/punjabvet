@@ -62,6 +62,8 @@ const Checkout = () => {
   const [applying, setApplying] = useState(false);
 
   const subtotal = totalPrice;
+  const listTotal = items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0);
+  const productSavings = Math.max(0, listTotal - subtotal);
   const discount = coupon?.discount || 0;
   const grandTotal = Math.max(0, subtotal - discount);
 
@@ -215,6 +217,12 @@ const Checkout = () => {
             <span className={`text-muted-foreground ${fontClass}`}>{isUrdu ? 'مصنوعات کی قیمت' : 'Product Total'}</span>
             <span>{t('rs')} {subtotal.toLocaleString()}</span>
           </div>
+          {productSavings > 0 && (
+            <div className="flex justify-between text-primary">
+              <span className={fontClass}>{isUrdu ? 'ڈسکاؤنٹ بچت' : 'Discount savings'}</span>
+              <span>− {t('rs')} {productSavings.toLocaleString()}</span>
+            </div>
+          )}
           {coupon && (
             <div className="flex justify-between text-primary">
               <span className="flex items-center gap-1"><Tag size={14} /> {coupon.code}</span>
