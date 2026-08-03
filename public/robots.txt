@@ -11,7 +11,6 @@ Disallow: /checkout
 Disallow: /reset-password
 Disallow: /api
 Disallow: /*.json$
-Disallow: /*.xml$
 Disallow: /?*sort
 Disallow: /?*filter
 Disallow: /?*search

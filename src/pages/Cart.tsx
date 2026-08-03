@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useCart } from '@/contexts/CartContext';
+import { useCart, effectivePrice } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2, ShoppingCart, AlertCircle } from 'lucide-react';
@@ -63,7 +63,12 @@ const Cart = () => {
               <h3 className={`text-sm font-medium text-foreground truncate ${fontClass}`}>
                 {isUrdu && item.product?.name_ur ? item.product.name_ur : item.product?.name}
               </h3>
-              <p className="text-primary font-bold">{t('rs')} {item.product?.price?.toLocaleString()}</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-primary font-bold">{t('rs')} {effectivePrice(item.product).toLocaleString()}</p>
+                {effectivePrice(item.product) < (item.product?.price || 0) && (
+                  <p className="text-xs text-muted-foreground line-through">{t('rs')} {item.product?.price?.toLocaleString()}</p>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

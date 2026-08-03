@@ -12,9 +12,17 @@ interface CartItem {
     name: string;
     name_ur: string | null;
     price: number;
+    discount_price: number | null;
     image_url: string | null;
   };
 }
+
+/** Price the customer actually pays — discounted price wins when valid. */
+export const effectivePrice = (product?: { price: number; discount_price?: number | null } | null) => {
+  if (!product) return 0;
+  const dp = product.discount_price;
+  return dp != null && dp > 0 && dp < product.price ? Number(dp) : Number(product.price);
+};
 
 interface CartContextType {
   items: CartItem[];
@@ -26,6 +34,7 @@ interface CartContextType {
   totalItems: number;
   totalPrice: number;
 }
+
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -39,7 +48,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     const { data } = await supabase
       .from('cart_items')
-      .select('id, product_id, quantity, products(id, name, name_ur, price, image_url)')
+      .select('id, product_id, quantity, products(id, name, name_ur, price, discount_price, image_url)')
       .eq('user_id', user.id);
     
     if (data) {
@@ -84,7 +93,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0);
+  const totalPrice = items.reduce((sum, i) => sum + effectivePrice(i.product) * i.quantity, 0);
 
   return (
     <CartContext.Provider value={{ items, loading, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>

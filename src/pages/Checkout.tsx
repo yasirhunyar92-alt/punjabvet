@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useCart } from '@/contexts/CartContext';
+import { useCart, effectivePrice } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -62,6 +62,8 @@ const Checkout = () => {
   const [applying, setApplying] = useState(false);
 
   const subtotal = totalPrice;
+  const listTotal = items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0);
+  const productSavings = Math.max(0, listTotal - subtotal);
   const discount = coupon?.discount || 0;
   const grandTotal = Math.max(0, subtotal - discount);
 
@@ -158,7 +160,7 @@ const Checkout = () => {
         product_id: item.product_id,
         product_name: item.product?.name || 'Unknown',
         quantity: item.quantity,
-        price_at_purchase: item.product?.price || 0,
+        price_at_purchase: effectivePrice(item.product),
       }));
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
       if (itemsError) throw itemsError;
@@ -207,7 +209,7 @@ const Checkout = () => {
         {items.map(item => (
           <div key={item.id} className="flex justify-between text-sm py-1">
             <span className={`text-muted-foreground ${fontClass}`}>{item.product?.name} × {item.quantity}</span>
-            <span className="font-medium">{t('rs')} {((item.product?.price || 0) * item.quantity).toLocaleString()}</span>
+            <span className="font-medium">{t('rs')} {(effectivePrice(item.product) * item.quantity).toLocaleString()}</span>
           </div>
         ))}
         <div className="border-t mt-3 pt-3 space-y-2 text-sm">
@@ -215,6 +217,12 @@ const Checkout = () => {
             <span className={`text-muted-foreground ${fontClass}`}>{isUrdu ? 'مصنوعات کی قیمت' : 'Product Total'}</span>
             <span>{t('rs')} {subtotal.toLocaleString()}</span>
           </div>
+          {productSavings > 0 && (
+            <div className="flex justify-between text-primary">
+              <span className={fontClass}>{isUrdu ? 'ڈسکاؤنٹ بچت' : 'Discount savings'}</span>
+              <span>− {t('rs')} {productSavings.toLocaleString()}</span>
+            </div>
+          )}
           {coupon && (
             <div className="flex justify-between text-primary">
               <span className="flex items-center gap-1"><Tag size={14} /> {coupon.code}</span>
