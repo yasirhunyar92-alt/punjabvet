@@ -1,6 +1,4 @@
 # Robots.txt for Punjab Veterinary Medical Store
-# Allow all bots to crawl the site
-
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -9,24 +7,14 @@ Disallow: /profile
 Disallow: /cart
 Disallow: /checkout
 Disallow: /reset-password
-Disallow: /api
-Disallow: /*.json$
-Disallow: /?*sort
-Disallow: /?*filter
-Disallow: /?*search
+Disallow: /*?*sort=
+Disallow: /*?*filter=
 
-# Sitemaps
-Sitemap: https://punjabveterinary.com/sitemap.xml
-Sitemap: https://punjabveterinary.com/api/sitemap.xml
-
-# Crawl delay (optional - adjust based on server capacity)
-Crawl-delay: 1
-
-# User-agent specific rules
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
 
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://punjabveterinary.com/sitemap.xml
