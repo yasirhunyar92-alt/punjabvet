@@ -600,7 +600,18 @@ const Blog = () => {
           {allPosts.map((post, i) => (
             <motion.article key={`${post.slug}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
               className="bg-card rounded-xl border shadow-sm overflow-hidden card-elevated cursor-pointer" onClick={() => openPost(post)}>
-              <div className="h-2 hero-gradient" />
+              {post.coverImage ? (
+                <img
+                  src={post.coverImage}
+                  alt={`${post.title} — veterinary blog`}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full aspect-[1200/630] object-cover"
+                />
+              ) : (
+                <div className="h-2 hero-gradient" />
+              )}
+
               <div className="p-5">
                 <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2">
                   <span className="uppercase font-bold text-primary tracking-wider">{isUrdu ? post.categoryUr : post.category}</span>
