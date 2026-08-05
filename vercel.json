@@ -33,12 +33,38 @@
       "source": "/rss.xml",
       "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=rss"
     },
-    { "source": "/((?!sitemap|rss).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!sitemap|rss).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
+      "source": "/sitemap(.*).xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/rss.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/rss+xml; charset=utf-8"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
