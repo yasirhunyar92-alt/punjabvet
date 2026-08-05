@@ -1,12 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, ArrowRight, ArrowLeft, Clock, User, Tag } from 'lucide-react';
+import { Calendar, ArrowRight, ArrowLeft, Clock, User, Tag, List } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import SEOHead from '@/components/SEOHead';
+import {
+  articleSchema,
+  autoInternalLinks,
+  breadcrumbSchema,
+  clampMeta,
+  extractToc,
+  graph,
+  organizationSchema,
+  readingMinutes,
+  websiteSchema,
+  type LinkTarget,
+  type TocItem,
+} from '@/lib/seo';
 
 interface BlogPost {
   id: number;
@@ -18,11 +31,43 @@ interface BlogPost {
   content: string;
   contentUr: string;
   date: string;
+  updatedAt?: string;
   category: string;
   categoryUr: string;
   readTime: string;
   author: string;
+  coverImage?: string | null;
+  tags?: string[];
+  seoTitle?: string | null;
+  seoDescription?: string | null;
 }
+
+/** Convert the markdown-ish post body into HTML with anchored headings. */
+const renderPostHtml = (content: string, toc: TocItem[], links: LinkTarget[]) => {
+  let headingIndex = 0;
+  const blocks = content.split('\n\n').map((block) => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+
+    const heading = trimmed.match(/^(#{2,3})\s+(.+)$/);
+    if (heading) {
+      const item = toc[headingIndex++];
+      const tag = heading[1].length === 2 ? 'h2' : 'h3';
+      const size = tag === 'h2' ? 'text-lg md:text-xl' : 'text-base';
+      return `<${tag} id="${item?.id ?? ''}" class="scroll-mt-24 ${size} font-bold text-foreground mt-7 mb-2">${heading[2].replace(/\*\*/g, '')}</${tag}>`;
+    }
+
+    const inline = trimmed
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')
+      .replace(/\n- /g, '<br/>• ')
+      .replace(/^- /, '• ')
+      .replace(/\n(\d)\./g, '<br/>$1.');
+    return `<p class="mb-4">${inline}</p>`;
+  });
+
+  return autoInternalLinks(blocks.join('\n'), links);
+};
+
 
 const blogPosts: BlogPost[] = [
   {
