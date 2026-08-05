@@ -24,10 +24,11 @@ import SiteImagesManagement from '@/components/admin/SiteImagesManagement';
 import NotificationsManagement from '@/components/admin/NotificationsManagement';
 import CustomersManagement from '@/components/admin/CustomersManagement';
 import ThemeManagement from '@/components/admin/ThemeManagement';
+import SeoDashboard from '@/components/admin/SeoDashboard';
 
 type SectionId =
   | 'analytics' | 'products' | 'orders' | 'customers' | 'categories'
-  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications' | 'themes';
+  | 'coupons' | 'banners' | 'blog' | 'import' | 'bulk-photos' | 'ai-bulk' | 'ai-importer' | 'site-images' | 'notifications' | 'themes' | 'seo';
 
 const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: any; badge?: 'pending-orders' }[] }[] = [
   {
@@ -58,6 +59,7 @@ const NAV_GROUPS: { label: string; items: { id: SectionId; label: string; icon: 
       { id: 'notifications', label: 'Notifications', icon: Bell },
       { id: 'blog', label: 'Blog', icon: FileText },
       { id: 'themes', label: 'AI Theme Changer', icon: Palette },
+      { id: 'seo', label: 'SEO & Indexing', icon: Search },
     ],
   },
 ];
@@ -77,6 +79,7 @@ const SECTION_TITLES: Record<SectionId, { title: string; subtitle: string }> = {
   'ai-importer': { title: 'AI Product Importer', subtitle: 'Import from name, URL, image, or PDF with preview & edit' },
   themes: { title: 'AI Theme Changer', subtitle: 'Generate festive website themes for 14 August, Eid and seasonal offers' },
   'site-images': { title: 'Site Images', subtitle: 'Manage homepage hero, services, and categories background images' },
+  seo: { title: 'SEO & Indexing', subtitle: 'Sitemaps, feeds, instant indexing and SEO health checks' },
   notifications: { title: 'Notifications', subtitle: 'Send announcements and promotional alerts to customers' },
 };
 
@@ -127,6 +130,7 @@ const Admin = () => {
       case 'ai-importer': return <AiProductImporter />;
       case 'site-images': return <SiteImagesManagement />;
       case 'themes': return <ThemeManagement />;
+      case 'seo': return <SeoDashboard />;
       case 'notifications': return <NotificationsManagement />;
     }
   };
