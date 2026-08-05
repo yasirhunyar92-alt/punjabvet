@@ -1,39 +1,44 @@
 {
-  "version": 2,
-  "builds": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "api/sitemap.ts",
-      "use": "@vercel/node"
+      "source": "/sitemap.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=index"
     },
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
+      "source": "/sitemap-index.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=index"
+    },
+    {
+      "source": "/sitemap-pages.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=pages"
+    },
+    {
+      "source": "/sitemap-products.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=products"
+    },
+    {
+      "source": "/sitemap-categories.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=categories"
+    },
+    {
+      "source": "/sitemap-blog.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=blog"
+    },
+    {
+      "source": "/sitemap-images.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=images"
+    },
+    {
+      "source": "/rss.xml",
+      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=rss"
+    },
+    { "source": "/((?!sitemap|rss).*)", "destination": "/index.html" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/sitemap(-\\d+)?\\.xml",
-      "dest": "/api/sitemap.ts",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/robots\\.txt",
-      "dest": "/public/robots.txt",
-      "methods": ["GET"]
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.ts",
-      "methods": ["GET"]
-    },
-    { "handle": "filesystem" },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "status": 200
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
 }
