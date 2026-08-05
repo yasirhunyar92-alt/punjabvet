@@ -78,6 +78,12 @@ const ProductDetail = () => {
   const allImages = (product.images && product.images.length > 0) ? product.images : (product.image_url ? [product.image_url] : []);
   const hasDiscount = product.discount_price && product.discount_price < product.price;
   const usageText = isUrdu && product.usage_instructions_ur ? product.usage_instructions_ur : product.usage_instructions;
+  const faqs: { question: string; answer: string }[] = Array.isArray(product.faqs)
+    ? (product.faqs as any[])
+        .map((f) => ({ question: String(f?.question ?? f?.q ?? ''), answer: String(f?.answer ?? f?.a ?? '') }))
+        .filter((f) => f.question && f.answer)
+    : [];
+
 
   return (
     <div className="container py-6">
