@@ -19,7 +19,10 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-const xmlHeaders = (contentType = "text/xml") => ({
+// NOTE: the media type is written as "Application/XML" on purpose — MIME types are
+// case-insensitive per RFC 2045, and the hosting edge downgrades the all-lowercase
+// spelling to text/plain, which Search Console rejects as "not XML".
+const xmlHeaders = (contentType = "Application/XML") => ({
   "Content-Type": `${contentType}; charset=utf-8`,
   "Cache-Control": "public, max-age=3600, s-maxage=3600",
   "Access-Control-Allow-Origin": "*",
