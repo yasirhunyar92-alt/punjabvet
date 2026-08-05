@@ -13,6 +13,8 @@ import WishlistButton from '@/components/WishlistButton';
 import ProductReviews from '@/components/ProductReviews';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { breadcrumbSchema, faqSchema, graph, organizationSchema, productSchema } from '@/lib/seo';
+
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -76,25 +78,54 @@ const ProductDetail = () => {
   const allImages = (product.images && product.images.length > 0) ? product.images : (product.image_url ? [product.image_url] : []);
   const hasDiscount = product.discount_price && product.discount_price < product.price;
   const usageText = isUrdu && product.usage_instructions_ur ? product.usage_instructions_ur : product.usage_instructions;
+  const faqs: { question: string; answer: string }[] = Array.isArray(product.faqs)
+    ? (product.faqs as any[])
+        .map((f) => ({ question: String(f?.question ?? f?.q ?? ''), answer: String(f?.answer ?? f?.a ?? '') }))
+        .filter((f) => f.question && f.answer)
+    : [];
+
 
   return (
     <div className="container py-6">
       <SEOHead
-        title={`${product.name} — Rs. ${product.discount_price || product.price}`}
-        description={`Buy ${product.name} at Rs. ${product.discount_price || product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || ''}`}
-        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
-        image={product.image_url || undefined}
-        url={`/product/${product.id}`}
+        title={product.seo_title || `${product.name} — Rs. ${product.discount_price || product.price}`}
+        description={
+          product.seo_description ||
+          `Buy ${product.name} at Rs. ${product.discount_price || product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || ''}`
+        }
+        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, ${(product.animal_type || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
+        image={allImages[0] || undefined}
+        imageAlt={`${product.name} — ${categoryName || 'veterinary product'}`}
+        url={`/product/${product.slug || product.id}`}
         type="product"
-        jsonLd={{
-          '@context': 'https://schema.org', '@type': 'Product', name: product.name,
-          description: product.description || `${product.name} available at Punjab Veterinary Medical Store`,
-          image: allImages, brand: { '@type': 'Brand', name: product.brand || 'Punjab Vet' },
-          offers: { '@type': 'Offer', price: product.discount_price || product.price, priceCurrency: 'PKR',
-            availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            seller: { '@type': 'Organization', name: 'Punjab Veterinary Medical Store' } },
-        }}
+        locale={isUrdu ? 'ur_PK' : 'en_PK'}
+        jsonLd={graph(
+          productSchema({
+            id: product.id,
+            slug: product.slug,
+            name: product.name,
+            description: product.description,
+            images: allImages,
+            brand: product.brand,
+            sku: product.sku,
+            price: product.price,
+            discountPrice: product.discount_price,
+            inStock: product.in_stock,
+            rating: product.rating,
+            ratingCount: product.rating_count,
+            category: categoryName,
+          }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Products', path: '/products' },
+            ...(categoryName ? [{ name: categoryName, path: `/products?category=${product.category_id}` }] : []),
+            { name: product.name, path: `/product/${product.slug || product.id}` },
+          ]),
+          faqs.length > 0 ? faqSchema(faqs) : null,
+          organizationSchema(),
+        )}
       />
+
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 flex-wrap">
@@ -242,7 +273,26 @@ const ProductDetail = () => {
         </section>
       )}
 
+      {faqs.length > 0 && (
+        <section className="mt-12 max-w-3xl">
+          <h2 className={`text-xl font-bold text-foreground mb-4 ${fontClass}`}>
+            {isUrdu ? 'عام سوالات' : 'Frequently Asked Questions'}
+          </h2>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group rounded-lg border bg-card p-4">
+                <summary className={`cursor-pointer font-semibold text-foreground text-sm ${fontClass}`}>
+                  {faq.question}
+                </summary>
+                <p className={`mt-2 text-sm text-muted-foreground leading-relaxed ${fontClass}`}>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
       <ProductReviews productId={product.id} />
+
       <RecentlyViewed excludeId={product.id} />
     </div>
   );
