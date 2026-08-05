@@ -19,7 +19,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-const xmlHeaders = (contentType = "application/xml") => ({
+const xmlHeaders = (contentType = "text/xml") => ({
   "Content-Type": `${contentType}; charset=utf-8`,
   "Cache-Control": "public, max-age=3600, s-maxage=3600",
   "Access-Control-Allow-Origin": "*",
