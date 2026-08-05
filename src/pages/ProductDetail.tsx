@@ -273,7 +273,26 @@ const ProductDetail = () => {
         </section>
       )}
 
+      {faqs.length > 0 && (
+        <section className="mt-12 max-w-3xl">
+          <h2 className={`text-xl font-bold text-foreground mb-4 ${fontClass}`}>
+            {isUrdu ? 'عام سوالات' : 'Frequently Asked Questions'}
+          </h2>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group rounded-lg border bg-card p-4">
+                <summary className={`cursor-pointer font-semibold text-foreground text-sm ${fontClass}`}>
+                  {faq.question}
+                </summary>
+                <p className={`mt-2 text-sm text-muted-foreground leading-relaxed ${fontClass}`}>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
       <ProductReviews productId={product.id} />
+
       <RecentlyViewed excludeId={product.id} />
     </div>
   );
