@@ -49,7 +49,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
+      <SEOHead
+        title="Vet Medicines, Vaccines & Feed Supplements Online"
+        description="Order genuine veterinary medicines, vaccines, dairy & poultry supplements from Punjab Veterinary Medical Store, Sillanwali. Fast delivery across Pakistan — call 0306-5757283."
+        keywords="veterinary medicine Pakistan, cattle vaccines, buffalo supplements, poultry medicine, dairy feed, Sillanwali vet store, Punjab Veterinary"
+        url="/"
+        locale={isUrdu ? 'ur_PK' : 'en_PK'}
+        jsonLd={graph(organizationSchema(), websiteSchema())}
+      />
       {/* Hero */}
+
       <section className="relative overflow-hidden">
         <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-[28rem] object-cover" width={1600} height={912} fetchPriority="high" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
