@@ -13,6 +13,9 @@ import supplementsImg from '@/assets/supplements-category.jpg';
 import PromoBanners from '@/components/PromoBanners';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useSiteImages } from '@/hooks/useSiteImages';
+import SEOHead from '@/components/SEOHead';
+import { graph, organizationSchema, websiteSchema } from '@/lib/seo';
+
 
 const categoryImages: Record<string, string> = {
   medicines: medicinesImg, vaccines: vaccinesImg, supplements: supplementsImg,
