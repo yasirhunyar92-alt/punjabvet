@@ -557,7 +557,32 @@ const Blog = () => {
         description="Expert veterinary tips on livestock vaccines, animal nutrition, deworming schedules & health care. Trusted advice from Punjab Vet Sillanwali."
         keywords="veterinary blog, livestock tips, animal health Pakistan, cattle vaccines, goat care, Punjab Vet blog"
         url="/blog"
+        locale={isUrdu ? 'ur_PK' : 'en_PK'}
+        jsonLd={graph(
+          {
+            '@type': 'Blog',
+            '@id': 'https://punjabveterinary.com/blog#blog',
+            name: 'Punjab Veterinary Blog',
+            url: 'https://punjabveterinary.com/blog',
+            inLanguage: ['en', 'ur'],
+            publisher: { '@id': 'https://punjabveterinary.com/#organization' },
+            blogPost: allPosts.slice(0, 20).map(p => ({
+              '@type': 'BlogPosting',
+              headline: clampMeta(p.title, 110),
+              url: `https://punjabveterinary.com/blog/${p.slug}`,
+              datePublished: new Date(p.date).toISOString(),
+              image: p.coverImage || undefined,
+            })),
+          },
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Blog', path: '/blog' },
+          ]),
+          websiteSchema(),
+          organizationSchema(),
+        )}
       />
+
 
       <section className="hero-gradient py-10">
         <div className="container text-center">
