@@ -313,7 +313,7 @@ const Blog = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('id, slug, title, title_ur, excerpt, excerpt_ur, content, content_ur, category, published_at, cover_image')
+        .select('id, slug, title, title_ur, excerpt, excerpt_ur, content, content_ur, category, tags, seo_title, seo_description, published_at, updated_at, cover_image')
         .eq('published', true)
         .order('published_at', { ascending: false });
       if (error) throw error;
@@ -327,11 +327,17 @@ const Blog = () => {
         content: p.content,
         contentUr: p.content_ur || p.content,
         date: (p.published_at || new Date().toISOString()).split('T')[0],
+        updatedAt: p.updated_at || p.published_at || undefined,
         category: p.category || 'General',
         categoryUr: p.category || 'عام',
-        readTime: `${Math.max(2, Math.round((p.content || '').split(/\s+/).length / 200))} min`,
+        readTime: `${readingMinutes(p.content)} min`,
         author: 'Punjab Vet Team',
+        coverImage: p.cover_image,
+        tags: p.tags || [],
+        seoTitle: p.seo_title,
+        seoDescription: p.seo_description,
       }));
+
     },
   });
 
