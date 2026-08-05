@@ -341,6 +341,18 @@ const Blog = () => {
     },
   });
 
+  const { data: linkProducts = [] } = useQuery({
+    queryKey: ['blog_link_products'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('products')
+        .select('id, slug, name')
+        .eq('in_stock', true)
+        .limit(60);
+      return data || [];
+    },
+  });
+
   const allPosts = [...dbPosts, ...blogPosts];
 
   useEffect(() => {
@@ -362,24 +374,64 @@ const Blog = () => {
     navigate('/blog');
   };
 
+  const body = selectedPost ? (isUrdu ? selectedPost.contentUr : selectedPost.content) : '';
+  const toc = useMemo(() => extractToc(body), [body]);
+  const linkTargets = useMemo<LinkTarget[]>(
+    () => linkProducts.map(p => ({ phrase: p.name, href: `/product/${p.slug || p.id}` })),
+    [linkProducts],
+  );
+  const postHtml = useMemo(
+    () => (body ? renderPostHtml(body, toc, isUrdu ? [] : linkTargets) : ''),
+    [body, toc, linkTargets, isUrdu],
+  );
+  const relatedPosts = useMemo(
+    () =>
+      selectedPost
+        ? allPosts
+            .filter(p => p.slug !== selectedPost.slug)
+            .sort((a, b) => Number(b.category === selectedPost.category) - Number(a.category === selectedPost.category))
+            .slice(0, 3)
+        : [],
+    [selectedPost, allPosts.length],
+  );
+
   if (selectedPost) {
     return (
       <div className="min-h-screen bg-muted/30">
         <SEOHead
-          title={isUrdu ? selectedPost.titleUr : selectedPost.title}
-          description={isUrdu ? selectedPost.excerptUr : selectedPost.excerpt}
-          keywords={`${selectedPost.category}, veterinary, Punjab Vet, Sillanwali, livestock, ${isUrdu ? 'ویٹرنری' : ''}`}
+          title={selectedPost.seoTitle || (isUrdu ? selectedPost.titleUr : selectedPost.title)}
+          description={selectedPost.seoDescription || (isUrdu ? selectedPost.excerptUr : selectedPost.excerpt)}
+          keywords={[selectedPost.category, ...(selectedPost.tags || []), 'veterinary Pakistan', 'Punjab Vet Sillanwali', 'livestock health']
+            .filter(Boolean)
+            .join(', ')}
           url={`/blog/${selectedPost.slug}`}
+          image={selectedPost.coverImage || undefined}
+          imageAlt={selectedPost.title}
           type="article"
-          jsonLd={{
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: selectedPost.title,
-            description: selectedPost.excerpt,
-            author: { '@type': 'Organization', name: 'Punjab Veterinary Medical Store' },
-            datePublished: selectedPost.date,
-            publisher: { '@type': 'Organization', name: 'Punjab Veterinary Medical Store' },
-          }}
+          locale={isUrdu ? 'ur_PK' : 'en_PK'}
+          publishedTime={new Date(selectedPost.date).toISOString()}
+          modifiedTime={selectedPost.updatedAt}
+          section={selectedPost.category}
+          tags={selectedPost.tags}
+          jsonLd={graph(
+            articleSchema({
+              title: selectedPost.title,
+              description: selectedPost.seoDescription || selectedPost.excerpt,
+              slug: selectedPost.slug,
+              image: selectedPost.coverImage,
+              publishedAt: new Date(selectedPost.date).toISOString(),
+              updatedAt: selectedPost.updatedAt,
+              category: selectedPost.category,
+              wordCount: selectedPost.content.split(/\s+/).length,
+              author: selectedPost.author,
+            }),
+            breadcrumbSchema([
+              { name: 'Home', path: '/' },
+              { name: 'Blog', path: '/blog' },
+              { name: selectedPost.title, path: `/blog/${selectedPost.slug}` },
+            ]),
+            organizationSchema(),
+          )}
         />
         <div className="container py-6 max-w-3xl">
           <button onClick={closePost} className={`inline-flex items-center gap-1 text-muted-foreground hover:text-foreground mb-4 text-sm ${f}`}>
@@ -387,6 +439,16 @@ const Blog = () => {
           </button>
 
           <article className="bg-card rounded-xl p-6 md:p-8 border shadow-sm">
+            {selectedPost.coverImage && (
+              <img
+                src={selectedPost.coverImage}
+                alt={`${selectedPost.title} — Punjab Veterinary Medical Store`}
+                width={1200}
+                height={630}
+                loading="eager"
+                className="w-full aspect-[1200/630] object-cover rounded-lg mb-5"
+              />
+            )}
             <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
               <span className="flex items-center gap-1"><Tag size={12} className="text-primary" /> {isUrdu ? selectedPost.categoryUr : selectedPost.category}</span>
               <span className="flex items-center gap-1"><Calendar size={12} /> {selectedPost.date}</span>
@@ -404,16 +466,36 @@ const Blog = () => {
               <span className="text-sm font-medium text-foreground">{selectedPost.author}</span>
             </div>
 
-            <div className={`prose prose-sm max-w-none text-muted-foreground leading-relaxed ${f}`}>
-              {(isUrdu ? selectedPost.contentUr : selectedPost.content).split('\n\n').map((paragraph, i) => (
-                <p key={i} className="mb-4" dangerouslySetInnerHTML={{
-                  __html: paragraph
-                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')
-                    .replace(/\n- /g, '<br/>• ')
-                    .replace(/\n(\d)\./g, '<br/>$1.')
-                }} />
-              ))}
-            </div>
+            {toc.length > 2 && (
+              <nav className="mb-6 rounded-lg border bg-muted/40 p-4">
+                <p className={`flex items-center gap-1.5 text-sm font-bold text-foreground mb-2 ${f}`}>
+                  <List size={14} className="text-primary" />
+                  {isUrdu ? 'فہرست' : 'Table of Contents'}
+                </p>
+                <ol className="space-y-1 text-sm">
+                  {toc.map((item) => (
+                    <li key={item.id} className={item.level === 3 ? 'ps-4' : ''}>
+                      <a href={`#${item.id}`} className={`text-muted-foreground hover:text-primary ${f}`}>
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+
+            <div
+              className={`prose prose-sm max-w-none text-muted-foreground leading-relaxed ${f}`}
+              dangerouslySetInnerHTML={{ __html: postHtml }}
+            />
+
+            {(selectedPost.tags || []).length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-6 pt-4 border-t">
+                {(selectedPost.tags || []).map(tag => (
+                  <span key={tag} className="text-[11px] rounded-full bg-muted px-2.5 py-1 text-muted-foreground">#{tag}</span>
+                ))}
+              </div>
+            )}
 
             {/* CTA */}
             <div className="mt-8 bg-primary/5 border border-primary/20 rounded-xl p-5 text-center">
@@ -423,16 +505,49 @@ const Blog = () => {
               <p className={`text-sm text-muted-foreground mb-3 ${f}`}>
                 {isUrdu ? 'پنجاب ویٹرنری میڈیکل سٹور، سیلنوالی' : 'Punjab Veterinary Medical Store, Sillanwali'}
               </p>
-              <a href="https://wa.me/923065757283" target="_blank" rel="noopener noreferrer">
-                <Button className="whatsapp-green border-0 font-bold">
-                  WhatsApp: 0306-5757283
-                </Button>
-              </a>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <a href="https://wa.me/923065757283" target="_blank" rel="noopener noreferrer">
+                  <Button className="whatsapp-green border-0 font-bold w-full">WhatsApp: 0306-5757283</Button>
+                </a>
+                <Link to="/products">
+                  <Button variant="outline" className={`w-full font-bold ${f}`}>
+                    {isUrdu ? 'ادویات دیکھیں' : 'Shop Vet Medicines'}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </article>
+
+          {relatedPosts.length > 0 && (
+            <section className="mt-8">
+              <h2 className={`text-base font-bold text-foreground mb-3 ${f}`}>
+                {isUrdu ? 'متعلقہ مضامین' : 'Related Articles'}
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {relatedPosts.map(p => (
+                  <button
+                    key={p.slug}
+                    onClick={() => openPost(p)}
+                    className="text-start bg-card border rounded-xl p-4 hover:border-primary/40 transition-colors"
+                  >
+                    <span className="text-[10px] uppercase font-bold text-primary tracking-wider">
+                      {isUrdu ? p.categoryUr : p.category}
+                    </span>
+                    <p className={`text-sm font-semibold text-foreground mt-1 line-clamp-2 ${f}`}>
+                      {isUrdu ? p.titleUr : p.title}
+                    </p>
+                    <span className="text-[11px] text-muted-foreground flex items-center gap-1 mt-2">
+                      <Clock size={10} /> {p.readTime}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     );
+
   }
 
   return (
