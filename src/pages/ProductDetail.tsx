@@ -80,21 +80,44 @@ const ProductDetail = () => {
   return (
     <div className="container py-6">
       <SEOHead
-        title={`${product.name} — Rs. ${product.discount_price || product.price}`}
-        description={`Buy ${product.name} at Rs. ${product.discount_price || product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || ''}`}
-        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
-        image={product.image_url || undefined}
-        url={`/product/${product.id}`}
+        title={product.seo_title || `${product.name} — Rs. ${product.discount_price || product.price}`}
+        description={
+          product.seo_description ||
+          `Buy ${product.name} at Rs. ${product.discount_price || product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || ''}`
+        }
+        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, ${(product.animal_type || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
+        image={allImages[0] || undefined}
+        imageAlt={`${product.name} — ${categoryName || 'veterinary product'}`}
+        url={`/product/${product.slug || product.id}`}
         type="product"
-        jsonLd={{
-          '@context': 'https://schema.org', '@type': 'Product', name: product.name,
-          description: product.description || `${product.name} available at Punjab Veterinary Medical Store`,
-          image: allImages, brand: { '@type': 'Brand', name: product.brand || 'Punjab Vet' },
-          offers: { '@type': 'Offer', price: product.discount_price || product.price, priceCurrency: 'PKR',
-            availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            seller: { '@type': 'Organization', name: 'Punjab Veterinary Medical Store' } },
-        }}
+        locale={isUrdu ? 'ur_PK' : 'en_PK'}
+        jsonLd={graph(
+          productSchema({
+            id: product.id,
+            slug: product.slug,
+            name: product.name,
+            description: product.description,
+            images: allImages,
+            brand: product.brand,
+            sku: product.sku,
+            price: product.price,
+            discountPrice: product.discount_price,
+            inStock: product.in_stock,
+            rating: product.rating,
+            ratingCount: product.rating_count,
+            category: categoryName,
+          }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Products', path: '/products' },
+            ...(categoryName ? [{ name: categoryName, path: `/products?category=${product.category_id}` }] : []),
+            { name: product.name, path: `/product/${product.slug || product.id}` },
+          ]),
+          faqs.length > 0 ? faqSchema(faqs) : null,
+          organizationSchema(),
+        )}
       />
+
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 flex-wrap">
