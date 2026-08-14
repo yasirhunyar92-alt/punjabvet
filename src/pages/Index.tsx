@@ -13,6 +13,8 @@ import supplementsImg from '@/assets/supplements-category.jpg';
 import PromoBanners from '@/components/PromoBanners';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useSiteImages } from '@/hooks/useSiteImages';
+import { optimizedImage, optimizedSrcSet } from '@/lib/image';
+
 import SEOHead from '@/components/SEOHead';
 import { graph, organizationSchema, websiteSchema } from '@/lib/seo';
 

@@ -4,6 +4,8 @@ import { Search, X, Package, Tag, PawPrint, FolderTree, Stethoscope, Loader2 } f
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Input } from '@/components/ui/input';
+import { optimizedImage } from '@/lib/image';
+
 
 type ProductLite = {
   id: string;
