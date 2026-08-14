@@ -65,7 +65,18 @@ const Index = () => {
       {/* Hero */}
 
       <section className="relative overflow-hidden">
-        <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-[28rem] object-cover" width={1600} height={912} fetchPriority="high" />
+        <img
+          src={optimizedImage(heroImg, 1200, { fit: 'cover', quality: 65 }) || heroImg}
+          srcSet={optimizedSrcSet(heroImg, [640, 1000, 1600])}
+          sizes="100vw"
+          alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'}
+          className="w-full h-64 md:h-[28rem] object-cover"
+          width={1600}
+          height={912}
+          fetchPriority="high"
+          decoding="async"
+        />
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="container">
@@ -113,7 +124,8 @@ const Index = () => {
       </section>
 
       {/* Services */}
-      <section className="py-6 relative bg-cover bg-center" style={servicesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url(${servicesBg})` } : undefined}>
+      <section className="py-6 relative bg-cover bg-center" style={servicesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url(${optimizedImage(servicesBg, 1000, { fit: 'cover', quality: 60 }) || servicesBg})` } : undefined}>
+
         <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہماری خدمات' : 'Our Services'}</h2>
         <div className="grid grid-cols-3 gap-3">
