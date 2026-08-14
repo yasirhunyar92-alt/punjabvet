@@ -142,7 +142,17 @@ const ProductDetail = () => {
         <div>
           <div className="aspect-square bg-muted rounded-xl overflow-hidden mb-3">
             {allImages.length > 0 ? (
-              <img src={allImages[selectedImage] || allImages[0]} alt={`${product.name} — Punjab Vet Sillanwali`} className="w-full h-full object-cover" />
+              <img
+                src={optimizedImage(allImages[selectedImage] || allImages[0], 800)}
+                srcSet={optimizedSrcSet(allImages[selectedImage] || allImages[0], [400, 800, 1200])}
+                sizes="(max-width: 768px) 100vw, 600px"
+                alt={`${product.name} — Punjab Vet Sillanwali`}
+                className="w-full h-full object-cover"
+                fetchPriority="high"
+                decoding="async"
+                width={800}
+                height={800}
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-6xl">🐄</div>
             )}
@@ -152,11 +162,12 @@ const ProductDetail = () => {
               {allImages.map((img: string, i: number) => (
                 <button key={i} onClick={() => setSelectedImage(i)}
                   className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === selectedImage ? 'border-primary' : 'border-border'}`}>
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={optimizedImage(img, 128)} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={64} height={64} />
                 </button>
               ))}
             </div>
           )}
+
         </div>
 
         {/* Info */}
@@ -187,7 +198,8 @@ const ProductDetail = () => {
               <div className="flex items-center gap-3">
                 <p className="text-3xl font-bold text-primary">{t('rs')} {product.discount_price.toLocaleString()}</p>
                 <p className="text-lg text-muted-foreground line-through">Rs. {product.price.toLocaleString()}</p>
-                <Badge className="bg-destructive hover:bg-destructive text-[11px]">-{Math.round(((product.price - product.discount_price) / product.price) * 100)}%</Badge>
+                <Badge className="bg-destructive hover:bg-destructive text-[11px]">{t('azadiOff')} -{Math.round(((product.price - product.discount_price) / product.price) * 100)}%</Badge>
+
               </div>
             ) : (
               <p className="text-3xl font-bold text-primary">{t('rs')} {product.price.toLocaleString()}</p>

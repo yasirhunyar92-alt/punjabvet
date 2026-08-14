@@ -219,7 +219,7 @@ const Checkout = () => {
           </div>
           {productSavings > 0 && (
             <div className="flex justify-between text-primary">
-              <span className={fontClass}>{isUrdu ? 'ڈسکاؤنٹ بچت' : 'Discount savings'}</span>
+              <span className={fontClass}>🇵🇰 {isUrdu ? 'آزادی ڈسکاؤنٹ بچت' : 'Azadi Discount savings'}</span>
               <span>− {t('rs')} {productSavings.toLocaleString()}</span>
             </div>
           )}
