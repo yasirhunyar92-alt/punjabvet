@@ -146,7 +146,7 @@ const Index = () => {
       </section>
 
       {/* Categories */}
-      <section className="py-5 relative bg-cover bg-center" style={categoriesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)), url(${categoriesBg})` } : undefined}>
+      <section className="py-5 relative bg-cover bg-center" style={categoriesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)), url(${optimizedImage(categoriesBg, 1000, { fit: 'cover', quality: 60 }) || categoriesBg})` } : undefined}>
         <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-3 ${f}`}>{t('categories')}</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
