@@ -5,6 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
 import WishlistButton from '@/components/WishlistButton';
+import { optimizedImage, optimizedSrcSet } from '@/lib/image';
+
 
 interface ProductCardProps {
   id: string;
@@ -33,7 +35,17 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
       <Link to={`/product/${id}`} className="block">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
-            <img src={imageUrl} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+            <img
+              src={optimizedImage(imageUrl, 400)}
+              srcSet={optimizedSrcSet(imageUrl, [200, 400, 600])}
+              sizes="(max-width: 640px) 45vw, 220px"
+              alt={name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              decoding="async"
+              width={400}
+              height={400}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-4xl bg-gradient-to-br from-muted to-accent/30">🐄</div>
           )}
@@ -42,9 +54,10 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
           )}
           {hasDiscount && (
             <Badge className="absolute bottom-1.5 left-1.5 text-[9px] px-1.5 py-0 h-4 bg-primary hover:bg-primary">
-              -{Math.round(((price - discountPrice) / price) * 100)}%
+              {t('azadiOff')} -{Math.round(((price - discountPrice) / price) * 100)}%
             </Badge>
           )}
+
           {!inStock && (
             <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center backdrop-blur-[1px]">
               <span className={`text-primary-foreground font-bold text-xs bg-destructive px-2 py-0.5 rounded ${fontClass}`}>{t('outOfStock')}</span>

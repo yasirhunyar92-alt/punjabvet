@@ -13,6 +13,8 @@ import supplementsImg from '@/assets/supplements-category.jpg';
 import PromoBanners from '@/components/PromoBanners';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useSiteImages } from '@/hooks/useSiteImages';
+import { optimizedImage, optimizedSrcSet } from '@/lib/image';
+
 import SEOHead from '@/components/SEOHead';
 import { graph, organizationSchema, websiteSchema } from '@/lib/seo';
 
@@ -63,7 +65,18 @@ const Index = () => {
       {/* Hero */}
 
       <section className="relative overflow-hidden">
-        <img src={heroImg} alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'} className="w-full h-64 md:h-[28rem] object-cover" width={1600} height={912} fetchPriority="high" />
+        <img
+          src={optimizedImage(heroImg, 1200, { fit: 'cover', quality: 65 }) || heroImg}
+          srcSet={optimizedSrcSet(heroImg, [640, 1000, 1600])}
+          sizes="100vw"
+          alt={isUrdu ? 'سیلنوالی میں پنجاب ویٹرنری میڈیکل سٹور' : 'Punjab Veterinary Medical Store Sillanwali'}
+          className="w-full h-64 md:h-[28rem] object-cover"
+          width={1600}
+          height={912}
+          fetchPriority="high"
+          decoding="async"
+        />
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="container">
@@ -111,7 +124,8 @@ const Index = () => {
       </section>
 
       {/* Services */}
-      <section className="py-6 relative bg-cover bg-center" style={servicesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url(${servicesBg})` } : undefined}>
+      <section className="py-6 relative bg-cover bg-center" style={servicesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url(${optimizedImage(servicesBg, 1000, { fit: 'cover', quality: 60 }) || servicesBg})` } : undefined}>
+
         <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-4 text-center ${f}`}>{isUrdu ? 'ہماری خدمات' : 'Our Services'}</h2>
         <div className="grid grid-cols-3 gap-3">
@@ -132,7 +146,7 @@ const Index = () => {
       </section>
 
       {/* Categories */}
-      <section className="py-5 relative bg-cover bg-center" style={categoriesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)), url(${categoriesBg})` } : undefined}>
+      <section className="py-5 relative bg-cover bg-center" style={categoriesBg ? { backgroundImage: `linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)), url(${optimizedImage(categoriesBg, 1000, { fit: 'cover', quality: 60 }) || categoriesBg})` } : undefined}>
         <div className="container">
         <h2 className={`text-lg font-bold text-foreground mb-3 ${f}`}>{t('categories')}</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -144,10 +158,11 @@ const Index = () => {
             <Link key={cat.id} to={`/products?category=${cat.id}`} className="flex-shrink-0 w-20 md:w-24 group">
               <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-accent border-2 border-transparent group-hover:border-primary transition-colors flex items-center justify-center overflow-hidden">
                 {cat.image_url ? (
-                  <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={optimizedImage(cat.image_url, 160)} alt={cat.name} className="w-full h-full object-cover" loading="lazy" decoding="async" width={80} height={80} />
                 ) : (
                   <img src={categoryImages[cat.name.toLowerCase()] || medicinesImg} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
                 )}
+
               </div>
               <p className={`text-[11px] md:text-xs text-center mt-1.5 font-medium text-foreground line-clamp-2 ${f}`}>
                 {isUrdu && cat.name_ur ? cat.name_ur : cat.name}

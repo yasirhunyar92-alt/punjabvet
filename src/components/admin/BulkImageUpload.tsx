@@ -38,7 +38,7 @@ async function uploadDataUrl(dataUrl: string, id: string): Promise<string> {
   const res = await fetch(dataUrl);
   const blob = await res.blob();
   const path = `bulk/bg-${Date.now()}-${id}.png`;
-  const { error } = await supabase.storage.from('product-images').upload(path, blob, { contentType: 'image/png' });
+  const { error } = await supabase.storage.from('product-images').upload(path, blob, { contentType: 'image/png', cacheControl: '31536000' });
   if (error) throw error;
   return supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
 }
@@ -118,7 +118,7 @@ const BulkImageUpload = () => {
         updateDraft(item.id, { status: 'uploading' });
         const ext = item.file.name.split('.').pop() || 'jpg';
         const path = `bulk/${Date.now()}-${item.id}.${ext}`;
-        const { error: upErr } = await supabase.storage.from('product-images').upload(path, item.file);
+        const { error: upErr } = await supabase.storage.from('product-images').upload(path, item.file, { cacheControl: '31536000' });
         if (upErr) throw upErr;
         const originalUrl = supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
         updateDraft(item.id, { originalUrl, storageUrl: originalUrl, status: 'analyzing' });

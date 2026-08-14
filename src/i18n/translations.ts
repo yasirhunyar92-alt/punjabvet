@@ -44,7 +44,10 @@ export const translations = {
     relatedProducts: 'Related Products',
     description: 'Description',
     featured: 'Featured',
-    discountPrice: 'Discount Price',
+    discountPrice: 'Azadi Discount Price',
+    azadiOff: 'AZADI',
+    azadiDiscount: 'Azadi Discount',
+
     tags: 'Tags',
     volumeSize: 'Volume/Size',
     brand: 'Brand',
@@ -222,7 +225,10 @@ export const translations = {
     relatedProducts: 'متعلقہ مصنوعات',
     description: 'تفصیل',
     featured: 'نمایاں',
-    discountPrice: 'رعایتی قیمت',
+    discountPrice: 'آزادی رعایتی قیمت',
+    azadiOff: 'آزادی',
+    azadiDiscount: 'آزادی ڈسکاؤنٹ',
+
     tags: 'ٹیگز',
     volumeSize: 'حجم/سائز',
     brand: 'برانڈ',

@@ -38,7 +38,7 @@ const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file);
+        .upload(filePath, file, { cacheControl: '31536000' });
 
       if (uploadError) throw uploadError;
 

@@ -136,7 +136,7 @@ const ProductsManagement = () => {
         const base64 = enhData.editedImage.replace(/^data:image\/\w+;base64,/, '');
         const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
         const fileName = `products/ai-${Date.now()}.png`;
-        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png' });
+        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png', cacheControl: '31536000' });
         if (!uploadErr) {
           const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
           const newUrl = urlData.publicUrl;

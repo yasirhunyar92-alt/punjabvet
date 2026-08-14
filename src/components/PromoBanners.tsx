@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { optimizedImage, optimizedSrcSet } from '@/lib/image';
+
 
 function useCountdown(target?: string | null) {
   const [now, setNow] = useState(Date.now());
@@ -50,7 +52,19 @@ const PromoBanners = () => {
 
   const inner = (
     <div className="relative h-32 md:h-44 rounded-xl overflow-hidden border bg-gradient-to-r from-primary/90 to-primary/60">
-      {b.image_url && <img src={b.image_url} alt={title} className="absolute inset-0 w-full h-full object-cover opacity-60" />}
+      {b.image_url && (
+        <img
+          src={optimizedImage(b.image_url, 900, { fit: 'cover', quality: 65 })}
+          srcSet={optimizedSrcSet(b.image_url, [600, 900, 1400])}
+          sizes="100vw"
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          decoding="async"
+          width={1400}
+          height={400}
+        />
+      )}
+
       <div className="relative h-full flex flex-col justify-center px-4 md:px-6 text-primary-foreground">
         <h3 className={`text-base md:text-xl font-bold ${f}`}>{title}</h3>
         {subtitle && <p className={`text-xs md:text-sm opacity-90 mt-1 ${f}`}>{subtitle}</p>}
