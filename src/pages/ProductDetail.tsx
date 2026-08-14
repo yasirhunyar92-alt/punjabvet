@@ -14,6 +14,8 @@ import ProductReviews from '@/components/ProductReviews';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { breadcrumbSchema, faqSchema, graph, organizationSchema, productSchema } from '@/lib/seo';
+import { optimizedImage, optimizedSrcSet } from '@/lib/image';
+
 
 
 const ProductDetail = () => {
