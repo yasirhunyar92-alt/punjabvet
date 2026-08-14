@@ -34,7 +34,7 @@ const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const filePath = `products/${fileName}`;
 
-        const { error } = await supabase.storage.from('product-images').upload(filePath, file);
+        const { error } = await supabase.storage.from('product-images').upload(filePath, file, { cacheControl: '31536000' });
         if (error) { toast.error(error.message); continue; }
 
         const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
@@ -80,7 +80,7 @@ const MultiImageUpload = ({ mainImage, images, onMainImageChange, onImagesChange
         const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
         const fileName = `products/ai-${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
 
-        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png' });
+        const { error: uploadErr } = await supabase.storage.from('product-images').upload(fileName, bytes, { contentType: 'image/png', cacheControl: '31536000' });
         if (uploadErr) throw uploadErr;
 
         const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
