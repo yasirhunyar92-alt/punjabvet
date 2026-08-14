@@ -4,6 +4,8 @@ import { useCart, effectivePrice } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2, ShoppingCart, AlertCircle } from 'lucide-react';
+import { optimizedImage } from '@/lib/image';
+
 
 const Cart = () => {
   const { t, isUrdu } = useLanguage();
@@ -53,7 +55,7 @@ const Cart = () => {
           <div key={item.id} className="bg-card border rounded-lg p-4 flex items-center gap-4">
             <div className="w-20 h-20 bg-muted rounded-md overflow-hidden flex-shrink-0">
               {item.product?.image_url ? (
-                <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover" />
+                <img src={optimizedImage(item.product.image_url, 160)} alt={item.product.name} className="w-full h-full object-cover" loading="lazy" decoding="async" width={80} height={80} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-2xl">🐄</div>
               )}

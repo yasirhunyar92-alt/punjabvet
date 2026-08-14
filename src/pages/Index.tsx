@@ -144,10 +144,11 @@ const Index = () => {
             <Link key={cat.id} to={`/products?category=${cat.id}`} className="flex-shrink-0 w-20 md:w-24 group">
               <div className="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-accent border-2 border-transparent group-hover:border-primary transition-colors flex items-center justify-center overflow-hidden">
                 {cat.image_url ? (
-                  <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={optimizedImage(cat.image_url, 160)} alt={cat.name} className="w-full h-full object-cover" loading="lazy" decoding="async" width={80} height={80} />
                 ) : (
                   <img src={categoryImages[cat.name.toLowerCase()] || medicinesImg} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
                 )}
+
               </div>
               <p className={`text-[11px] md:text-xs text-center mt-1.5 font-medium text-foreground line-clamp-2 ${f}`}>
                 {isUrdu && cat.name_ur ? cat.name_ur : cat.name}

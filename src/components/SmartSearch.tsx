@@ -155,7 +155,7 @@ const SmartSearch = ({ placeholder, autoFocus, onNavigate, className = '' }: Pro
                     className="w-full flex items-center gap-3 px-3 py-2 hover:bg-accent text-left transition-colors">
                     <div className="w-10 h-10 rounded bg-muted overflow-hidden flex items-center justify-center flex-shrink-0">
                       {p.image_url ? (
-                        <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
+                        <img src={optimizedImage(p.image_url, 96)} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       ) : (
                         <Package size={16} className="text-muted-foreground" />
                       )}
