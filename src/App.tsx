@@ -12,6 +12,8 @@ import FestiveBanner from "@/components/FestiveBanner";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import RouteSeo from "@/components/RouteSeo";
+
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -46,7 +48,9 @@ const App = () => (
             <CartProvider>
              <ThemeProvider>
               <div className="flex flex-col min-h-screen">
+                <RouteSeo />
                 <FestiveBanner />
+
                 <Header />
                 <main className="flex-1">
                   <Routes>
