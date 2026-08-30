@@ -59,26 +59,21 @@ async function rest<T>(table: string, query: string): Promise<T[]> {
 }
 
 async function dynamicEntries(): Promise<Entry[]> {
-  const [products, posts, categories] = await Promise.all([
+  const [products, posts] = await Promise.all([
     rest<{ id: string; slug: string | null; updated_at: string | null }>(
       'products',
       'select=id,slug,updated_at&limit=5000',
     ),
-    rest<{ slug: string; updated_at: string | null; published: boolean }>(
+    rest<{ slug: string; updated_at: string | null }>(
       'blog_posts',
       'select=slug,updated_at&published=eq.true&limit=2000',
     ),
-    rest<{ slug: string }>('categories', 'select=slug&limit=200'),
   ])
 
+  // Category/filter URLs are intentionally excluded: they are query-parameter
+  // facets of /products and canonicalise back to /products.
   return [
-    ...categories
-      .filter((c) => c.slug)
-      .map<Entry>((c) => ({
-        path: `/products?category=${encodeURIComponent(c.slug)}`,
-        changefreq: 'weekly',
-        priority: '0.7',
-      })),
+
     ...products.map<Entry>((p) => ({
       path: `/product/${p.slug || p.id}`,
       lastmod: day(p.updated_at),

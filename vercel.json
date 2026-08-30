@@ -2,13 +2,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=index"
-    },
-    {
       "source": "/sitemap-index.xml",
       "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=index"
     },
+
     {
       "source": "/sitemap-pages.xml",
       "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=pages"
