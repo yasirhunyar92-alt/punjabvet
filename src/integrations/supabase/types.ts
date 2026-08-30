@@ -488,6 +488,35 @@ export type Database = {
           },
         ]
       }
+      product_slug_history: {
+        Row: {
+          created_at: string
+          id: string
+          old_slug: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          old_slug: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          old_slug?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_slug_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           animal_type: string[] | null
@@ -502,6 +531,7 @@ export type Database = {
           faqs: Json | null
           featured: boolean | null
           id: string
+          image_alt: string | null
           image_url: string | null
           images: string[] | null
           in_stock: boolean | null
@@ -534,6 +564,7 @@ export type Database = {
           faqs?: Json | null
           featured?: boolean | null
           id?: string
+          image_alt?: string | null
           image_url?: string | null
           images?: string[] | null
           in_stock?: boolean | null
@@ -566,6 +597,7 @@ export type Database = {
           faqs?: Json | null
           featured?: boolean | null
           id?: string
+          image_alt?: string | null
           image_url?: string | null
           images?: string[] | null
           in_stock?: boolean | null
@@ -756,6 +788,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      slugify: { Args: { value: string }; Returns: string }
       update_order_contact: {
         Args: {
           _address: string
