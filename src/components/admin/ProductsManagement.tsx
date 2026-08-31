@@ -216,6 +216,11 @@ const ProductsManagement = () => {
       expiry_date: form.expiry_date || null, batch_number: form.batch_number || null,
       usage_instructions: form.usage_instructions || null,
       usage_instructions_ur: form.usage_instructions_ur || null,
+      slug: form.slug.trim() || null,
+      seo_title: form.seo_title.trim() || null,
+      seo_description: form.seo_description.trim() || null,
+      image_alt: form.image_alt.trim() || null,
+
     };
 
     if (editProduct) {
