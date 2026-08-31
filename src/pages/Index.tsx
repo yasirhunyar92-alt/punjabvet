@@ -91,7 +91,7 @@ const Index = () => {
               <p className={`text-primary-foreground/85 text-xs md:text-sm mb-4 leading-relaxed ${f}`}>
                 {isUrdu ? 'معیاری ادویات، ویکسینز اور سپلیمنٹس — سیلنوالی سے آپ کی دہلیز تک' : 'Quality medicines, vaccines & supplements — from Sillanwali to your doorstep'}
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Link to="/products"><Button size="lg" variant="secondary" className={`font-bold shadow-lg text-sm ${f}`}>{isUrdu ? 'ابھی آرڈر کریں' : 'Order Now'} <ArrowRight size={16} /></Button></Link>
                 <Link to="/contact"><Button size="lg" variant="outline" className={`border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-sm ${f}`}>{t('contactUs')}</Button></Link>
               </div>
