@@ -32,7 +32,8 @@ const RecentlyViewed = ({ excludeId }: Props) => {
         {products.map(p => (
           <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
             discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
-            tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+            tags={p.tags} rating={p.rating} ratingCount={p.rating_count}
+                imageAlt={(p as any).image_alt} slug={(p as any).slug} />
         ))}
       </div>
     </section>
