@@ -20,26 +20,30 @@ interface ProductCardProps {
   tags?: string[] | null;
   rating?: number | null;
   ratingCount?: number | null;
+  imageAlt?: string | null;
+  slug?: string | null;
 }
 
-const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock = true, featured, tags, rating, ratingCount }: ProductCardProps) => {
+const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock = true, featured, tags, rating, ratingCount, imageAlt, slug }: ProductCardProps) => {
   const { t, isUrdu } = useLanguage();
   const { addToCart } = useCart();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const displayName = isUrdu && nameUr ? nameUr : name;
   const whatsappMsg = encodeURIComponent(`Hello, I want to order "${name}" from Punjab Veterinary Medical Store.`);
   const hasDiscount = discountPrice && discountPrice < price;
+  const href = `/product/${slug || id}`;
+  const altText = imageAlt?.trim() || `${name} — Punjab Veterinary Medical Store`;
 
   return (
     <div className="relative bg-card rounded-xl border overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-      <Link to={`/product/${id}`} className="block">
+      <Link to={href} className="block">
         <div className="aspect-square bg-muted relative overflow-hidden">
           {imageUrl ? (
             <img
               src={optimizedImage(imageUrl, 400)}
               srcSet={optimizedSrcSet(imageUrl, [200, 400, 600])}
               sizes="(max-width: 640px) 45vw, 220px"
-              alt={name}
+              alt={altText}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
               decoding="async"
@@ -68,7 +72,7 @@ const ProductCard = ({ id, name, nameUr, price, discountPrice, imageUrl, inStock
       <WishlistButton productId={id} className="absolute top-1.5 right-1.5 z-10" />
 
       <div className="p-2.5 flex flex-col flex-1">
-        <Link to={`/product/${id}`}>
+        <Link to={href}>
           <h3 className={`text-xs font-medium text-foreground line-clamp-2 mb-1 leading-snug hover:text-primary transition-colors ${fontClass}`}>
             {displayName}
           </h3>

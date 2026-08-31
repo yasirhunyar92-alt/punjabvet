@@ -91,7 +91,7 @@ const Index = () => {
               <p className={`text-primary-foreground/85 text-xs md:text-sm mb-4 leading-relaxed ${f}`}>
                 {isUrdu ? 'معیاری ادویات، ویکسینز اور سپلیمنٹس — سیلنوالی سے آپ کی دہلیز تک' : 'Quality medicines, vaccines & supplements — from Sillanwali to your doorstep'}
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Link to="/products"><Button size="lg" variant="secondary" className={`font-bold shadow-lg text-sm ${f}`}>{isUrdu ? 'ابھی آرڈر کریں' : 'Order Now'} <ArrowRight size={16} /></Button></Link>
                 <Link to="/contact"><Button size="lg" variant="outline" className={`border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-sm ${f}`}>{t('contactUs')}</Button></Link>
               </div>
@@ -189,7 +189,8 @@ const Index = () => {
             {featuredProducts.map(p => (
               <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
                 discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
-                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count}
+                imageAlt={(p as any).image_alt} slug={(p as any).slug} />
             ))}
           </div>
         </section>
@@ -221,7 +222,8 @@ const Index = () => {
             {allProducts.map(p => (
               <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
                 discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
-                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+                featured={p.featured ?? false} tags={p.tags} rating={p.rating} ratingCount={p.rating_count}
+                imageAlt={(p as any).image_alt} slug={(p as any).slug} />
             ))}
           </div>
         ) : (

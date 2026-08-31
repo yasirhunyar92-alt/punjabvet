@@ -59,17 +59,17 @@ const Header = () => {
         </p>
       </div>
 
-      <div className="container flex items-center gap-3 py-3">
+      <div className="container flex items-center gap-2 sm:gap-3 py-3 min-w-0">
         <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-foreground">
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        <Link to="/" className="flex-shrink-0">
+        <Link to="/" className="min-w-0">
           <div className="flex flex-col leading-tight">
-            <span className={`text-base font-extrabold tracking-tight text-primary ${isUrdu ? 'font-urdu text-sm' : ''}`}>
+            <span className={`text-sm sm:text-base font-extrabold tracking-tight text-primary truncate ${isUrdu ? 'font-urdu text-sm' : ''}`}>
               Punjab Veterinary
             </span>
-            <span className={`text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground ${isUrdu ? 'font-urdu text-[9px] tracking-normal' : ''}`}>
+            <span className={`text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-muted-foreground truncate ${isUrdu ? 'font-urdu text-[9px] tracking-normal' : ''}`}>
               Medical Store
             </span>
           </div>
@@ -79,7 +79,7 @@ const Header = () => {
           <SmartSearch />
         </div>
 
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-0.5 sm:gap-1 ml-auto flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"

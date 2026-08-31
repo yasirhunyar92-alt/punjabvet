@@ -27,14 +27,46 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const { add: addRecent } = useRecentlyViewed();
 
+  const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
-      const { data } = await supabase.from('products').select('*, categories(name, name_ur)').eq('id', id!).single();
-      return data;
+      const key = id!;
+      const select = '*, categories(name, name_ur)';
+
+      // 1. Try current slug
+      const { data: bySlug } = await supabase.from('products').select(select).eq('slug', key).maybeSingle();
+      if (bySlug) return bySlug;
+
+      // 2. Try UUID
+      if (isUuid(key)) {
+        const { data: byId } = await supabase.from('products').select(select).eq('id', key).maybeSingle();
+        if (byId) return byId;
+      }
+
+      // 3. Try old slug from redirect history
+      const { data: history } = await supabase
+        .from('product_slug_history')
+        .select('product_id')
+        .eq('old_slug', key)
+        .maybeSingle();
+      if (history?.product_id) {
+        const { data: byHistory } = await supabase.from('products').select(select).eq('id', history.product_id).maybeSingle();
+        if (byHistory) return byHistory;
+      }
+      return null;
     },
     enabled: !!id,
   });
+
+  // Canonical redirect: UUID or old slug -> current slug
+  useEffect(() => {
+    const current = (product as any)?.slug;
+    if (current && id && id !== current) {
+      navigate(`/product/${current}`, { replace: true });
+    }
+  }, [product, id, navigate]);
 
   const { data: relatedProducts } = useQuery({
     queryKey: ['related-products', product?.category_id],
@@ -97,7 +129,7 @@ const ProductDetail = () => {
         }
         keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, ${(product.animal_type || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
         image={allImages[0] || undefined}
-        imageAlt={`${product.name} — ${categoryName || 'veterinary product'}`}
+        imageAlt={product.image_alt || `${product.name} — ${categoryName || 'veterinary product'}`}
         url={`/product/${product.slug || product.id}`}
         type="product"
         locale={isUrdu ? 'ur_PK' : 'en_PK'}
@@ -148,7 +180,7 @@ const ProductDetail = () => {
                 src={optimizedImage(allImages[selectedImage] || allImages[0], 800)}
                 srcSet={optimizedSrcSet(allImages[selectedImage] || allImages[0], [400, 800, 1200])}
                 sizes="(max-width: 768px) 100vw, 600px"
-                alt={`${product.name} — Punjab Vet Sillanwali`}
+                alt={product.image_alt || `${product.name} — Punjab Vet Sillanwali`}
                 className="w-full h-full object-cover"
                 fetchPriority="high"
                 decoding="async"
@@ -164,7 +196,7 @@ const ProductDetail = () => {
               {allImages.map((img: string, i: number) => (
                 <button key={i} onClick={() => setSelectedImage(i)}
                   className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === selectedImage ? 'border-primary' : 'border-border'}`}>
-                  <img src={optimizedImage(img, 128)} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={64} height={64} />
+                  <img src={optimizedImage(img, 128)} alt={`${product.name} view ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" width={64} height={64} />
                 </button>
               ))}
             </div>
@@ -281,7 +313,8 @@ const ProductDetail = () => {
             {relatedProducts.map(p => (
               <ProductCard key={p.id} id={p.id} name={p.name} nameUr={p.name_ur} price={p.price}
                 discountPrice={p.discount_price} imageUrl={p.image_url} inStock={p.in_stock ?? true}
-                tags={p.tags} rating={p.rating} ratingCount={p.rating_count} />
+                tags={p.tags} rating={p.rating} ratingCount={p.rating_count}
+                imageAlt={(p as any).image_alt} slug={(p as any).slug} />
             ))}
           </div>
         </section>

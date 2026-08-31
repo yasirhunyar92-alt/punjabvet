@@ -25,6 +25,7 @@ interface ProductForm {
   volume_size: string; stock_quantity: string; animal_type: string[];
   brand: string; sku: string; expiry_date: string; batch_number: string;
   usage_instructions: string; usage_instructions_ur: string;
+  slug: string; seo_title: string; seo_description: string; image_alt: string;
 }
 
 const emptyForm: ProductForm = {
@@ -32,7 +33,9 @@ const emptyForm: ProductForm = {
   category_id: '', featured: false, in_stock: true, image_url: '', images: [], tags: [],
   volume_size: '', stock_quantity: '0', animal_type: [], brand: '', sku: '', expiry_date: '',
   batch_number: '', usage_instructions: '', usage_instructions_ur: '',
+  slug: '', seo_title: '', seo_description: '', image_alt: '',
 };
+
 
 const ProductsManagement = () => {
   const { t, isUrdu } = useLanguage();
@@ -192,7 +195,10 @@ const ProductsManagement = () => {
       brand: p.brand || '', sku: p.sku || '', expiry_date: p.expiry_date || '',
       batch_number: p.batch_number || '', usage_instructions: p.usage_instructions || '',
       usage_instructions_ur: p.usage_instructions_ur || '',
+      slug: p.slug || '', seo_title: p.seo_title || '', seo_description: p.seo_description || '',
+      image_alt: p.image_alt || '',
     });
+
     setMoreOpen(false);
     setDialogOpen(true);
   };
@@ -210,6 +216,11 @@ const ProductsManagement = () => {
       expiry_date: form.expiry_date || null, batch_number: form.batch_number || null,
       usage_instructions: form.usage_instructions || null,
       usage_instructions_ur: form.usage_instructions_ur || null,
+      slug: form.slug.trim() || null,
+      seo_title: form.seo_title.trim() || null,
+      seo_description: form.seo_description.trim() || null,
+      image_alt: form.image_alt.trim() || null,
+
     };
 
     if (editProduct) {
@@ -378,6 +389,32 @@ const ProductsManagement = () => {
                 </div>
                 <div><Label>{t('usageInstructions')} (EN)</Label><Textarea value={form.usage_instructions} onChange={e => f('usage_instructions', e.target.value)} rows={2} /></div>
                 <div><Label>{t('usageInstructions')} (Urdu)</Label><Textarea value={form.usage_instructions_ur} onChange={e => f('usage_instructions_ur', e.target.value)} className="font-urdu text-right" dir="rtl" rows={2} /></div>
+
+                <div className="pt-2 border-t space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO</p>
+                  <div>
+                    <Label>URL slug</Label>
+                    <Input
+                      value={form.slug}
+                      onChange={e => f('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, ''))}
+                      placeholder="auto-generated from name if empty"
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">/product/{form.slug || 'auto-slug'} — old slugs keep redirecting.</p>
+                  </div>
+                  <div>
+                    <Label>Meta title <span className="text-muted-foreground">({form.seo_title.length}/60)</span></Label>
+                    <Input value={form.seo_title} onChange={e => f('seo_title', e.target.value)} maxLength={70} placeholder="Product name — key benefit | Punjab Vet" />
+                  </div>
+                  <div>
+                    <Label>Meta description <span className="text-muted-foreground">({form.seo_description.length}/160)</span></Label>
+                    <Textarea value={form.seo_description} onChange={e => f('seo_description', e.target.value)} rows={2} maxLength={180} placeholder="Short, benefit-led summary with price and location." />
+                  </div>
+                  <div>
+                    <Label>Image alt text</Label>
+                    <Input value={form.image_alt} onChange={e => f('image_alt', e.target.value)} placeholder="e.g. Calcium tonic bottle for dairy cattle" />
+                  </div>
+                </div>
+
               </CollapsibleContent>
             </Collapsible>
 
