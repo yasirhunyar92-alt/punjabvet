@@ -25,6 +25,7 @@ interface ProductForm {
   volume_size: string; stock_quantity: string; animal_type: string[];
   brand: string; sku: string; expiry_date: string; batch_number: string;
   usage_instructions: string; usage_instructions_ur: string;
+  slug: string; seo_title: string; seo_description: string; image_alt: string;
 }
 
 const emptyForm: ProductForm = {
@@ -32,7 +33,9 @@ const emptyForm: ProductForm = {
   category_id: '', featured: false, in_stock: true, image_url: '', images: [], tags: [],
   volume_size: '', stock_quantity: '0', animal_type: [], brand: '', sku: '', expiry_date: '',
   batch_number: '', usage_instructions: '', usage_instructions_ur: '',
+  slug: '', seo_title: '', seo_description: '', image_alt: '',
 };
+
 
 const ProductsManagement = () => {
   const { t, isUrdu } = useLanguage();
