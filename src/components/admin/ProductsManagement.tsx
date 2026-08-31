@@ -195,7 +195,10 @@ const ProductsManagement = () => {
       brand: p.brand || '', sku: p.sku || '', expiry_date: p.expiry_date || '',
       batch_number: p.batch_number || '', usage_instructions: p.usage_instructions || '',
       usage_instructions_ur: p.usage_instructions_ur || '',
+      slug: p.slug || '', seo_title: p.seo_title || '', seo_description: p.seo_description || '',
+      image_alt: p.image_alt || '',
     });
+
     setMoreOpen(false);
     setDialogOpen(true);
   };
