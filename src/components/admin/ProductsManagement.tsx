@@ -389,6 +389,32 @@ const ProductsManagement = () => {
                 </div>
                 <div><Label>{t('usageInstructions')} (EN)</Label><Textarea value={form.usage_instructions} onChange={e => f('usage_instructions', e.target.value)} rows={2} /></div>
                 <div><Label>{t('usageInstructions')} (Urdu)</Label><Textarea value={form.usage_instructions_ur} onChange={e => f('usage_instructions_ur', e.target.value)} className="font-urdu text-right" dir="rtl" rows={2} /></div>
+
+                <div className="pt-2 border-t space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO</p>
+                  <div>
+                    <Label>URL slug</Label>
+                    <Input
+                      value={form.slug}
+                      onChange={e => f('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, ''))}
+                      placeholder="auto-generated from name if empty"
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">/product/{form.slug || 'auto-slug'} — old slugs keep redirecting.</p>
+                  </div>
+                  <div>
+                    <Label>Meta title <span className="text-muted-foreground">({form.seo_title.length}/60)</span></Label>
+                    <Input value={form.seo_title} onChange={e => f('seo_title', e.target.value)} maxLength={70} placeholder="Product name — key benefit | Punjab Vet" />
+                  </div>
+                  <div>
+                    <Label>Meta description <span className="text-muted-foreground">({form.seo_description.length}/160)</span></Label>
+                    <Textarea value={form.seo_description} onChange={e => f('seo_description', e.target.value)} rows={2} maxLength={180} placeholder="Short, benefit-led summary with price and location." />
+                  </div>
+                  <div>
+                    <Label>Image alt text</Label>
+                    <Input value={form.image_alt} onChange={e => f('image_alt', e.target.value)} placeholder="e.g. Calcium tonic bottle for dairy cattle" />
+                  </div>
+                </div>
+
               </CollapsibleContent>
             </Collapsible>
 
