@@ -13,7 +13,7 @@ import WishlistButton from '@/components/WishlistButton';
 import ProductReviews from '@/components/ProductReviews';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
-import { breadcrumbSchema, faqSchema, graph, organizationSchema, productSchema } from '@/lib/seo';
+import { breadcrumbSchema, faqSchema, graph, organizationSchema, productMeta, productSchema } from '@/lib/seo';
 import { optimizedImage, optimizedSrcSet } from '@/lib/image';
 
 
@@ -119,17 +119,25 @@ const ProductDetail = () => {
     : [];
 
 
+  // Auto-generated metadata from real product fields; admin overrides win.
+  const autoMeta = productMeta({
+    name: product.name,
+    description: product.description,
+    category: (product.categories as any)?.name,
+    brand: product.brand,
+    animalTypes: product.animal_type,
+    price: product.price,
+    discountPrice: product.discount_price,
+  });
+
   return (
     <div className="container py-6">
       <SEOHead
-        title={product.seo_title || `${product.name} — Rs. ${product.discount_price || product.price}`}
-        description={
-          product.seo_description ||
-          `Buy ${product.name} at Rs. ${product.discount_price || product.price} from Punjab Veterinary Medical Store Sillanwali. ${product.description || ''}`
-        }
-        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, ${(product.animal_type || []).join(', ')}, veterinary medicine Sillanwali, Punjab Vet`}
+        title={product.seo_title || autoMeta.title}
+        description={product.seo_description || autoMeta.description}
+        keywords={`${product.name}, ${categoryName}, ${(product.tags || []).join(', ')}, ${(product.animal_type || []).join(', ')}, veterinary medicine Pakistan, animal health products Pakistan`}
         image={allImages[0] || undefined}
-        imageAlt={product.image_alt || `${product.name} — ${categoryName || 'veterinary product'}`}
+        imageAlt={product.image_alt || autoMeta.imageAlt}
         url={`/product/${product.slug || product.id}`}
         type="product"
         locale={isUrdu ? 'ur_PK' : 'en_PK'}
