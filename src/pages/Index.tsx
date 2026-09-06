@@ -55,9 +55,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       <SEOHead
-        title="Vet Medicines, Vaccines & Feed Supplements Online"
-        description="Order genuine veterinary medicines, vaccines, dairy & poultry supplements from Punjab Veterinary Medical Store, Sillanwali. Fast delivery across Pakistan — call 0306-5757283."
-        keywords="veterinary medicine Pakistan, cattle vaccines, buffalo supplements, poultry medicine, dairy feed, Sillanwali vet store, Punjab Veterinary"
+        title="Veterinary Medicines & Supplements in Pakistan"
+        description="Buy veterinary medicines, livestock supplements, animal health products and veterinary supplies in Pakistan. Order online from Punjab Veterinary Medical Store."
+        keywords="veterinary medicines Pakistan, veterinary medicine online Pakistan, livestock medicines Pakistan, cattle medicines Pakistan, buffalo medicines, goat medicines, poultry veterinary medicines, veterinary vaccines Pakistan, livestock supplements Pakistan, animal health products Pakistan"
         url="/"
         locale={isUrdu ? 'ur_PK' : 'en_PK'}
         jsonLd={graph(organizationSchema(), websiteSchema())}

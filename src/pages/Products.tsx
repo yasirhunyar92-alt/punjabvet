@@ -11,6 +11,7 @@ import { useState, useMemo } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
+import { breadcrumbSchema, categorySeo, graph } from '@/lib/seo';
 
 const ANIMAL_TYPES = ['Cow', 'Buffalo', 'Goat', 'Sheep', 'Poultry', 'Horse', 'Dog', 'Cat'];
 
@@ -103,18 +104,62 @@ const Products = () => {
     setSelectedCategory('all'); setSelectedAnimal('all'); setSelectedTag('all'); setSearchQuery(''); setPriceMin(''); setPriceMax(''); setOnlyOffers(false);
   };
 
+  const activeCategory = selectedCategory !== 'all'
+    ? categories?.find(c => c.id === selectedCategory)
+    : undefined;
+  const activeCategoryName = activeCategory
+    ? (isUrdu && (activeCategory as any).name_ur ? (activeCategory as any).name_ur : activeCategory.name)
+    : '';
+  const cSeo = categorySeo(activeCategory?.name);
+  // Only the plain listing and clean category facets are canonical/indexable —
+  // search, animal, tag, price and sort combinations point back to them.
+  const canonicalUrl = activeCategory ? `/products?category=${activeCategory.id}` : '/products';
+  const noindexFacet = !!(searchQuery.trim() || selectedAnimal !== 'all' || selectedTag !== 'all' || priceMin || priceMax || onlyOffers);
+
   return (
     <div className="container py-6">
-      <SEOHead title="Products" description="Browse quality veterinary medicines, vaccines and supplements at Punjab Vet Sillanwali." url="/products" />
+      <SEOHead
+        title={cSeo?.title ?? 'Veterinary Medicines & Supplements Online in Pakistan'}
+        description={
+          cSeo?.description ??
+          'Shop veterinary medicines, vaccines, livestock supplements and pet care products for cattle, buffalo, goats, sheep, poultry, dogs and cats across Pakistan.'
+        }
+        url={canonicalUrl}
+        noindex={noindexFacet}
+        locale={isUrdu ? 'ur_PK' : 'en_PK'}
+        jsonLd={graph(
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Products', path: '/products' },
+            ...(activeCategory ? [{ name: activeCategory.name, path: canonicalUrl }] : []),
+          ]),
+        )}
+      />
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 flex-wrap">
         <Link to="/" className="hover:text-primary">{t('breadcrumbHome')}</Link>
         <span>/</span>
-        <span className="text-foreground font-medium">{t('products')}</span>
+        {activeCategoryName ? (
+          <>
+            <Link to="/products" className="hover:text-primary">{t('products')}</Link>
+            <span>/</span>
+            <span className="text-foreground font-medium">{activeCategoryName}</span>
+          </>
+        ) : (
+          <span className="text-foreground font-medium">{t('products')}</span>
+        )}
       </nav>
 
-      <h1 className={`text-2xl font-bold text-foreground mb-4 ${fontClass}`}>{t('products')}</h1>
+      <h1 className={`text-2xl font-bold text-foreground mb-2 ${fontClass}`}>
+        {activeCategoryName || (isUrdu ? t('products') : 'Veterinary Medicines & Supplements in Pakistan')}
+      </h1>
+      {!isUrdu && (
+        <p className="text-sm text-muted-foreground mb-4 max-w-3xl leading-relaxed">
+          {cSeo?.intro ??
+            'Browse veterinary medicines, vaccines, livestock supplements and pet care products for cattle, buffalo, goats, sheep and poultry. We deliver across Pakistan and our store is in Sillanwali, Punjab. For dosing or treatment choice, please consult a qualified veterinarian.'}
+        </p>
+      )}
 
       {/* Search Bar */}
       <div className="relative mb-4">

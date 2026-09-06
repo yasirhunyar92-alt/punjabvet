@@ -239,3 +239,170 @@ export const graph = (...nodes: (Record<string, unknown> | null | undefined)[]) 
   '@context': 'https://schema.org',
   '@graph': nodes.filter(Boolean),
 });
+
+/* ------------------------------------------------------------------ */
+/* National (Pakistan-wide) SEO helpers                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Auto-generated product metadata built only from real database fields.
+ * Never invents ingredients, dosage, claims, brands or certifications.
+ */
+export const productMeta = (p: {
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  brand?: string | null;
+  animalTypes?: string[] | null;
+  price?: number | null;
+  discountPrice?: number | null;
+}) => {
+  const price = p.discountPrice && p.price && p.discountPrice < p.price ? p.discountPrice : p.price;
+  const animals = (p.animalTypes ?? []).filter(Boolean).slice(0, 3).join(', ');
+
+  // Keep the "Pakistan" signal but shorten gracefully for long product names.
+  const suffix = p.name.length > 34 ? 'Pakistan' : 'Veterinary Medicine Pakistan';
+  const title = clampMeta(`${p.name} | ${suffix}`, 62);
+
+  const parts = [
+    `Buy ${p.name}${p.category ? ` (${p.category})` : ''} online in Pakistan`,
+    price ? `Price Rs. ${price}.` : '',
+    animals ? `Suitable for ${animals}.` : '',
+    p.description ? p.description : 'Order from Punjab Veterinary Medical Store with delivery across Pakistan.',
+  ].filter(Boolean);
+
+  return {
+    title,
+    description: clampMeta(parts.join(' '), 158),
+    imageAlt: clampMeta(`${p.name}${p.category ? ` ${p.category}` : ''} veterinary product Pakistan`, 110),
+    slug: slugify(p.name),
+  };
+};
+
+export interface CategorySeo {
+  title: string;
+  description: string;
+  heading: string;
+  intro: string;
+}
+
+/** Keyword-mapped copy for the main category facets, matched on category name. */
+const CATEGORY_SEO: { match: RegExp; seo: CategorySeo }[] = [
+  {
+    match: /vaccin/i,
+    seo: {
+      title: 'Veterinary Vaccines in Pakistan — Livestock & Poultry',
+      description:
+        'Buy veterinary vaccines for cattle, buffalo, goats, sheep and poultry online in Pakistan. Cold-chain handled and delivered nationwide.',
+      heading: 'Veterinary Vaccines in Pakistan',
+      intro:
+        'Vaccines help protect herds and flocks from preventable disease. Choose products with your veterinarian, and follow the vaccination schedule and storage instructions supplied with each pack.',
+    },
+  },
+  {
+    match: /supplement|feed|mineral|vitamin|calcium/i,
+    seo: {
+      title: 'Livestock & Cattle Supplements in Pakistan',
+      description:
+        'Livestock supplements, cattle minerals, calcium tonics and vitamins for dairy and meat animals. Order online in Pakistan from Punjab Veterinary.',
+      heading: 'Livestock & Cattle Supplements in Pakistan',
+      intro:
+        'Supplements support milk production, growth and general condition when the base ration is short of minerals or vitamins. Feeding rates vary by animal weight and stage, so ask a qualified veterinarian before starting a new product.',
+    },
+  },
+  {
+    match: /poultry|chicken|broiler/i,
+    seo: {
+      title: 'Poultry Veterinary Medicines in Pakistan',
+      description:
+        'Poultry medicines, vaccines and supplements for broiler and layer flocks. Buy online in Pakistan with delivery to farms nationwide.',
+      heading: 'Poultry Veterinary Medicines in Pakistan',
+      intro:
+        'Flock health depends on clean water, biosecurity and timely treatment. Use poultry products strictly as labelled and observe any withdrawal periods before eggs or meat enter the food chain.',
+    },
+  },
+  {
+    match: /goat|sheep|bakri/i,
+    seo: {
+      title: 'Goat & Sheep Medicines in Pakistan',
+      description:
+        'Medicines, dewormers and supplements for goats and sheep. Order online in Pakistan from Punjab Veterinary Medical Store.',
+      heading: 'Goat & Sheep Medicines in Pakistan',
+      intro:
+        'Small ruminants need dosing by bodyweight and regular parasite control. Confirm the diagnosis and dose with a veterinarian before treating a flock.',
+    },
+  },
+  {
+    match: /cattle|cow|buffalo|dairy/i,
+    seo: {
+      title: 'Cattle & Buffalo Medicines in Pakistan',
+      description:
+        'Cattle and buffalo medicines, tonics and dairy health products for farms across Pakistan. Buy online from Punjab Veterinary.',
+      heading: 'Cattle & Buffalo Medicines in Pakistan',
+      intro:
+        'Dairy and beef animals need correct dosing, milk withdrawal awareness and a clear diagnosis. Your veterinarian can confirm which product suits the case.',
+    },
+  },
+  {
+    match: /pet|dog|cat/i,
+    seo: {
+      title: 'Pet Medicines in Pakistan — Dogs & Cats',
+      description:
+        'Pet medicines, dewormers, tick treatments and supplements for dogs and cats. Order online in Pakistan from Punjab Veterinary.',
+      heading: 'Pet Medicines in Pakistan',
+      intro:
+        'Pet products are dosed by weight and species — never split livestock products for a dog or cat. A veterinarian can advise the right size and strength.',
+    },
+  },
+  {
+    match: /medicine|dawa|antibiotic|treatment/i,
+    seo: {
+      title: 'Veterinary Medicines in Pakistan — Buy Online',
+      description:
+        'Veterinary medicines for cattle, buffalo, goats, sheep and poultry. Buy animal medicines online in Pakistan from Punjab Veterinary Medical Store.',
+      heading: 'Veterinary Medicines in Pakistan',
+      intro:
+        'Browse veterinary medicines used on livestock and poultry farms across Pakistan. Treatment choice, dose and duration should always be confirmed by a qualified veterinarian.',
+    },
+  },
+];
+
+export const categorySeo = (name?: string | null): CategorySeo | null => {
+  if (!name) return null;
+  const hit = CATEGORY_SEO.find((c) => c.match.test(name));
+  if (hit) return hit.seo;
+  return {
+    title: `${name} — Animal Health Products in Pakistan`,
+    description: clampMeta(
+      `Shop ${name} online in Pakistan. Veterinary and animal health products delivered nationwide by Punjab Veterinary Medical Store.`,
+    ),
+    heading: `${name} in Pakistan`,
+    intro: `Products in our ${name} range, available to order online across Pakistan. Speak to a qualified veterinarian for advice on choosing and using any animal health product.`,
+  };
+};
+
+/** Homepage LocalBusiness node — keeps the Sillanwali signal beside the national one. */
+export const localBusinessSchema = () => ({
+  '@type': 'LocalBusiness',
+  '@id': `${SITE_URL}/#localbusiness`,
+  name: SITE_NAME,
+  url: SITE_URL,
+  image: SITE_LOGO,
+  telephone: SITE_PHONE,
+  priceRange: 'Rs.',
+  currenciesAccepted: 'PKR',
+  parentOrganization: { '@id': `${SITE_URL}/#organization` },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Main Bazaar, Sillanwali',
+    addressLocality: 'Sillanwali',
+    addressRegion: 'Punjab',
+    postalCode: '40430',
+    addressCountry: 'PK',
+  },
+  areaServed: [
+    { '@type': 'Country', name: 'Pakistan' },
+    { '@type': 'City', name: 'Sillanwali' },
+    { '@type': 'City', name: 'Sargodha' },
+  ],
+});
