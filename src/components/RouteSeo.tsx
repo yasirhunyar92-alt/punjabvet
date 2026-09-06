@@ -22,28 +22,29 @@ interface RouteMeta {
 const EXACT: Record<string, RouteMeta> = {
   '/': {
     description:
-      'Quality veterinary medicines, vaccines and dairy supplements in Sillanwali. Call 0306-5757283 — trusted by local farmers and pet owners.',
+      'Buy veterinary medicines, livestock supplements, animal health products and veterinary supplies in Pakistan. Order online from Punjab Veterinary Medical Store.',
   },
   '/products': {
-    title: 'Veterinary Products — Medicines, Vaccines & Supplements',
+    title: 'Veterinary Medicines & Supplements Online in Pakistan',
     description:
-      'Browse veterinary medicines, vaccines, dairy supplements and pet care products for cattle, buffalo, goats, poultry, dogs and cats.',
+      'Shop veterinary medicines, vaccines, livestock supplements and pet care products for cattle, buffalo, goats, sheep, poultry, dogs and cats across Pakistan.',
   },
   '/about': {
-    title: 'About Us — Veterinary Store in Sillanwali',
+    title: 'About Punjab Veterinary — Animal Health Store',
     description:
-      'Punjab Veterinary Medical Store has served farmers and livestock owners in Sillanwali for years with certified animal health products.',
+      'Punjab Veterinary Medical Store supplies veterinary medicines and livestock supplements across Pakistan from our store in Sillanwali, Punjab.',
   },
   '/contact': {
     title: 'Contact Us — Call or WhatsApp 0306-5757283',
     description:
-      'Contact Punjab Veterinary Medical Store in Sillanwali, Punjab. Call or WhatsApp 0306-5757283 for medicine advice, prices and orders.',
+      'Contact Punjab Veterinary Medical Store for orders and product advice anywhere in Pakistan. Store located in Sillanwali, Punjab. Call or WhatsApp 0306-5757283.',
   },
   '/blog': {
-    title: 'Veterinary Blog — Animal Health Guides',
+    title: 'Veterinary Guides — Livestock & Animal Health',
     description:
-      'Practical guides on livestock health, vaccination schedules, dairy nutrition and disease prevention from Punjab Veterinary Medical Store.',
+      'Buying guides and practical advice on veterinary medicines, livestock supplements, vaccination schedules and animal health for farmers in Pakistan.',
   },
+
   '/shipping': {
     title: 'Shipping & Delivery Information',
     description:
