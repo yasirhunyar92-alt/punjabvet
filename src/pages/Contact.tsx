@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
+import StoreLocation from '@/components/StoreLocation';
 import { toast } from 'sonner';
 
 const Contact = () => {
@@ -55,14 +56,8 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Map */}
-            <div className="bg-card rounded-xl overflow-hidden border shadow-sm">
-              <iframe
-                src="https://www.google.com/maps?q=Islam+Nagar+Road,+Sillanwali,+Pakistan&output=embed"
-                width="100%" height="280" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
-                title="Punjab Vet Location — Islam Nagar Road, Sillanwali"
-              />
-            </div>
+            {/* Live Google map + real store photos */}
+            <StoreLocation />
           </div>
 
           {/* Contact Form */}
