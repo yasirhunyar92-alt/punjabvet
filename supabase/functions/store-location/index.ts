@@ -57,8 +57,24 @@ Deno.serve(async (req) => {
 
     const place = await res.json();
 
+    let rawPhotos = place.photos ?? [];
+    if (!rawPhotos.length) {
+      // Some listings only expose photos through search — fall back to it.
+      const sr = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
+        method: 'POST',
+        headers: { ...headers(), 'X-Goog-FieldMask': 'places.id,places.photos' },
+        body: JSON.stringify({ textQuery: 'Punjab Veterinary Medical Store Sillanwali' }),
+      });
+      if (sr.ok) {
+        const sj = await sr.json();
+        rawPhotos = (sj.places ?? []).find((p: { id: string }) => p.id === PLACE_ID)?.photos ?? [];
+      } else {
+        console.error(`Photo search fallback failed [${sr.status}]: ${(await sr.text()).slice(0, 200)}`);
+      }
+    }
+
     // Resolve up to 6 photo URLs (server-side; the browser gets plain image URLs).
-    const photoRefs = (place.photos ?? []).slice(0, 6);
+    const photoRefs = rawPhotos.slice(0, 6);
     const photos: { url: string; attribution?: string }[] = [];
     for (const p of photoRefs) {
       try {
