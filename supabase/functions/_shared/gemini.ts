@@ -25,22 +25,49 @@ export function jsonError(message: string, status = 500) {
   });
 }
 
-async function callGemini(model: string, body: Record<string, unknown>) {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Text model fallbacks used when the primary model is overloaded. */
+const TEXT_FALLBACKS = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
+
+async function rawCall(model: string, body: Record<string, unknown>) {
   const res = await fetch(`${BASE}/${model}:generateContent?key=${getGeminiKey()}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+  return res;
+}
 
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("Gemini error:", res.status, text.slice(0, 600));
-    if (res.status === 429) throw new GeminiError("Gemini rate limit reached, try again shortly", 429);
-    if (res.status === 403 || res.status === 401) throw new GeminiError("Gemini API key is invalid or lacks access", 401);
-    throw new GeminiError("Gemini request failed", 502);
+async function callGemini(model: string, body: Record<string, unknown>) {
+  // Try the requested model, then alternates, retrying transient overloads.
+  const models = TEXT_FALLBACKS.includes(model)
+    ? [model, ...TEXT_FALLBACKS.filter((m) => m !== model)]
+    : [model];
+
+  let lastStatus = 0;
+  for (const m of models) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const res = await rawCall(m, body);
+      if (res.ok) return await res.json();
+
+      const text = await res.text();
+      lastStatus = res.status;
+      console.error(`Gemini error (${m}, attempt ${attempt + 1}):`, res.status, text.slice(0, 300));
+
+      if (res.status === 403 || res.status === 401) {
+        throw new GeminiError("Gemini API key is invalid or lacks access", 401);
+      }
+      if (res.status === 429 || res.status === 503 || res.status >= 500) {
+        await sleep(700 * (attempt + 1));
+        continue; // transient — retry, then fall through to the next model
+      }
+      throw new GeminiError("Gemini request failed", 502);
+    }
   }
 
-  return await res.json();
+  if (lastStatus === 429) throw new GeminiError("Gemini rate limit reached, try again shortly", 429);
+  throw new GeminiError("The AI service is busy right now. Please try again in a moment.", 503);
 }
 
 export class GeminiError extends Error {
