@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     const photos: { url: string; attribution?: string }[] = [];
     for (const p of photoRefs) {
       try {
-        const pr = await fetch(`${GATEWAY}/${p.name}/media?maxWidthPx=1200&skipHttpRedirect=true`, {
+        const pr = await fetch(`${GATEWAY}/places/v1/${p.name}/media?maxWidthPx=1200&skipHttpRedirect=true`, {
           headers: headers(),
         });
         if (!pr.ok) {
