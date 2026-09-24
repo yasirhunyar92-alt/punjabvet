@@ -5,7 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, MessageCircle, Star, ChevronRight, Zap } from 'lucide-react';
+import { ShoppingCart, MessageCircle, Star, ChevronRight, Zap, Minus, Plus, ShieldCheck, Truck, Headphones } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import ProductCard from '@/components/ProductCard';
 import { Badge } from '@/components/ui/badge';
 import SEOHead from '@/components/SEOHead';
@@ -22,9 +24,12 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, isUrdu } = useLanguage();
-  const { addToCart } = useCart();
+  const { addToCart, items, updateQuantity } = useCart();
+  const { user } = useAuth();
   const fontClass = isUrdu ? 'font-urdu' : '';
   const [selectedImage, setSelectedImage] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [busy, setBusy] = useState(false);
   const { add: addRecent } = useRecentlyViewed();
 
   const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
@@ -81,10 +86,34 @@ const ProductDetail = () => {
     if (product?.id) addRecent(product.id);
   }, [product?.id, addRecent]);
 
+  const addQty = async () => {
+    if (!product) return false;
+    if (!user) {
+      toast.error(isUrdu ? 'خریداری کے لیے لاگ ان کریں' : 'Please log in to continue');
+      navigate('/auth');
+      return false;
+    }
+    setBusy(true);
+    try {
+      const existing = items.find(i => i.product_id === product.id);
+      if (existing) await updateQuantity(existing.id, existing.quantity + qty);
+      else {
+        await addToCart(product.id);
+        if (qty > 1) {
+          const { data } = await supabase.from('cart_items').select('id').eq('user_id', user.id).eq('product_id', product.id).maybeSingle();
+          if (data) await updateQuantity(data.id, qty);
+        }
+      }
+      return true;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleAddToCart = async () => { await addQty(); };
+
   const handleBuyNow = async () => {
-    if (!product) return;
-    await addToCart(product.id);
-    navigate('/checkout');
+    if (await addQty()) navigate('/checkout');
   };
 
   if (isLoading) return (
@@ -234,82 +263,115 @@ const ProductDetail = () => {
             </div>
           )}
 
-          {/* Price */}
-          <div className="mb-4">
+          {/* Price card */}
+          <div className="mt-3 rounded-xl border bg-card p-4 shadow-sm">
             {hasDiscount ? (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <p className="text-3xl font-bold text-primary">{t('rs')} {product.discount_price.toLocaleString()}</p>
-                <p className="text-lg text-muted-foreground line-through">Rs. {product.price.toLocaleString()}</p>
+                <p className="text-base text-muted-foreground line-through">Rs. {product.price.toLocaleString()}</p>
                 <Badge className="bg-destructive hover:bg-destructive text-[11px]">{t('azadiOff')} -{Math.round(((product.price - product.discount_price) / product.price) * 100)}%</Badge>
-
+                <p className="w-full text-sm font-medium text-primary">
+                  {isUrdu ? 'آپ کی بچت' : 'You save'} Rs. {(product.price - product.discount_price).toLocaleString()}
+                </p>
               </div>
             ) : (
               <p className="text-3xl font-bold text-primary">{t('rs')} {product.price.toLocaleString()}</p>
             )}
+            <div className="mt-2 flex items-center gap-2">
+              <span className={`inline-block h-2 w-2 rounded-full ${product.in_stock ? 'bg-primary' : 'bg-destructive'}`} />
+              <span className={`text-sm font-medium ${product.in_stock ? 'text-primary' : 'text-destructive'} ${fontClass}`}>
+                {product.in_stock ? t('inStock') : t('outOfStock')}
+              </span>
+              {product.stock_quantity > 0 && product.stock_quantity <= 10 && (
+                <span className="text-xs text-muted-foreground">· {isUrdu ? `صرف ${product.stock_quantity} باقی` : `Only ${product.stock_quantity} left`}</span>
+              )}
+            </div>
+
+            {/* Quantity + actions */}
+            <div className="mt-4 flex items-center gap-3">
+              <span className={`text-sm text-muted-foreground ${fontClass}`}>{isUrdu ? 'تعداد' : 'Quantity'}</span>
+              <div className="flex items-center rounded-lg border">
+                <button type="button" aria-label="Decrease quantity" onClick={() => setQty(q => Math.max(1, q - 1))} className="p-2 hover:bg-muted rounded-l-lg"><Minus size={16} /></button>
+                <span className="w-10 text-center font-semibold">{qty}</span>
+                <button type="button" aria-label="Increase quantity" onClick={() => setQty(q => Math.min(99, q + 1))} className="p-2 hover:bg-muted rounded-r-lg"><Plus size={16} /></button>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button size="lg" onClick={handleBuyNow} disabled={!product.in_stock || busy} className={fontClass}>
+                <Zap size={18} /> {t('buyNow')}
+              </Button>
+              <Button size="lg" variant="outline" onClick={handleAddToCart} disabled={!product.in_stock || busy} className={fontClass}>
+                <ShoppingCart size={18} /> {t('addToCart')}
+              </Button>
+              <a href={`https://wa.me/923065757283?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer" className="sm:col-span-2">
+                <Button size="lg" variant="outline" className={`w-full whatsapp-green border-0 ${fontClass}`}>
+                  <MessageCircle size={18} /> {t('orderViaWhatsApp')}
+                </Button>
+              </a>
+            </div>
           </div>
 
-          <Badge variant={product.in_stock ? 'default' : 'destructive'} className={fontClass}>
-            {product.in_stock ? t('inStock') : t('outOfStock')}
-          </Badge>
-          {product.stock_quantity > 0 && <span className="text-xs text-muted-foreground ml-2">{product.stock_quantity} available</span>}
+          {/* Trust badges */}
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+            {[
+              { icon: ShieldCheck, en: '100% Genuine', ur: '100٪ اصل' },
+              { icon: Truck, en: 'All Pakistan Delivery', ur: 'پورے پاکستان میں ڈیلیوری' },
+              { icon: Headphones, en: 'Vet Advice on WhatsApp', ur: 'واٹس ایپ پر مشورہ' },
+            ].map(({ icon: Icon, en, ur }) => (
+              <div key={en} className="rounded-lg bg-muted/60 p-2.5">
+                <Icon size={18} className="mx-auto text-primary" />
+                <p className={`mt-1 text-[11px] leading-tight font-medium text-foreground ${fontClass}`}>{isUrdu ? ur : en}</p>
+              </div>
+            ))}
+          </div>
 
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {product.tags.map((tag: string) => (
+          {/* Animal Types + Tags */}
+          {(product.animal_type?.length > 0 || product.tags?.length > 0) && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {product.animal_type?.map((a: string) => (
+                <Badge key={a} variant="secondary" className="text-xs">{a}</Badge>
+              ))}
+              {product.tags?.map((tag: string) => (
                 <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
               ))}
             </div>
           )}
 
-          {/* Animal Types */}
-          {product.animal_type && product.animal_type.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {product.animal_type.map((a: string) => (
-                <Badge key={a} variant="secondary" className="text-xs">{a}</Badge>
-              ))}
+          {/* Details */}
+          {(product.brand || product.volume_size || product.sku || product.expiry_date || product.batch_number) && (
+            <div className="mt-5 rounded-xl border overflow-hidden">
+              <h3 className={`bg-muted/60 px-4 py-2 text-sm font-semibold text-foreground ${fontClass}`}>{isUrdu ? 'تفصیلات' : 'Product Details'}</h3>
+              <dl className="divide-y text-sm">
+                {[
+                  [t('brand'), product.brand],
+                  [t('volumeSize'), product.volume_size],
+                  [t('sku'), product.sku],
+                  [t('expiryDate'), product.expiry_date],
+                  [t('batchNumber'), product.batch_number],
+                ].filter(([, v]) => v).map(([k, v]) => (
+                  <div key={k as string} className="flex justify-between gap-4 px-4 py-2">
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="font-medium text-right">{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           )}
 
-          {/* Details */}
-          <div className="mt-4 space-y-2 text-sm">
-            {product.brand && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('brand')}</span><span className="font-medium">{product.brand}</span></div>}
-            {product.volume_size && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('volumeSize')}</span><span className="font-medium">{product.volume_size}</span></div>}
-            {product.sku && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('sku')}</span><span className="font-medium">{product.sku}</span></div>}
-            {product.expiry_date && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('expiryDate')}</span><span className="font-medium">{product.expiry_date}</span></div>}
-            {product.batch_number && <div className="flex justify-between border-b border-dashed border-border pb-1"><span className="text-muted-foreground">{t('batchNumber')}</span><span className="font-medium">{product.batch_number}</span></div>}
-          </div>
-
-          {/* Description - Benefits */}
           {displayDesc && (
             <div className="mt-6">
               <h3 className={`font-semibold text-foreground mb-2 ${fontClass}`}>{t('description')}</h3>
-              <p className={`text-muted-foreground leading-relaxed ${fontClass}`}>{displayDesc}</p>
+              <p className={`text-muted-foreground leading-relaxed whitespace-pre-line ${fontClass}`}>{displayDesc}</p>
             </div>
           )}
 
-          {/* Usage Instructions */}
           {usageText && (
-            <div className="mt-4">
-              <h3 className={`font-semibold text-foreground mb-2 ${fontClass}`}>{t('usageInstructions')}</h3>
-              <p className={`text-muted-foreground leading-relaxed text-sm ${fontClass}`}>{usageText}</p>
+            <div className="mt-4 rounded-xl border-l-4 border-primary bg-muted/40 p-4">
+              <h3 className={`font-semibold text-foreground mb-1 ${fontClass}`}>{t('usageInstructions')}</h3>
+              <p className={`text-muted-foreground leading-relaxed text-sm whitespace-pre-line ${fontClass}`}>{usageText}</p>
             </div>
           )}
-
-          {/* Action Buttons: Buy Now + Add to Cart */}
-          <div className="flex flex-col gap-3 mt-8">
-            <Button size="lg" onClick={handleBuyNow} disabled={!product.in_stock} className={`bg-accent-foreground hover:bg-accent-foreground/90 ${fontClass}`}>
-              <Zap size={18} /> {t('buyNow')}
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => addToCart(product.id)} disabled={!product.in_stock} className={fontClass}>
-              <ShoppingCart size={18} /> {t('addToCart')}
-            </Button>
-            <a href={`https://wa.me/923065757283?text=${whatsappMsg}`} target="_blank" rel="noopener noreferrer">
-              <Button size="lg" variant="outline" className={`w-full whatsapp-green border-0 ${fontClass}`}>
-                <MessageCircle size={18} /> {t('orderViaWhatsApp')}
-              </Button>
-            </a>
-          </div>
         </div>
       </div>
 
