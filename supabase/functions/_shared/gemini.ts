@@ -62,7 +62,8 @@ async function callGemini(model: string, body: Record<string, unknown>) {
         await sleep(700 * (attempt + 1));
         continue; // transient — retry, then fall through to the next model
       }
-      throw new GeminiError("Gemini request failed", 502);
+      if (res.status === 404 && models.length > 1) break; // model unavailable — try next
+      throw new GeminiError("The AI could not process this request. Try a clearer image or different input.", 400);
     }
   }
 
