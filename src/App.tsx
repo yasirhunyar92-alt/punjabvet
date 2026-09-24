@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import RouteSeo from "@/components/RouteSeo";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import Index from "./pages/Index";
 import Products from "./pages/Products";
@@ -48,6 +49,7 @@ const App = () => (
             <CartProvider>
              <ThemeProvider>
               <div className="flex flex-col min-h-screen">
+                <ScrollToTop />
                 <RouteSeo />
                 <FestiveBanner />
 

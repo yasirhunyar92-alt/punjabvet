@@ -55,20 +55,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let active = true;
 
     const initializeAuth = async () => {
-      for (let attempt = 0; attempt < 5; attempt += 1) {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-
-        if (!active) return;
-
-        if (currentSession || attempt === 4) {
-          applySession(currentSession);
-          setLoading(false);
-          return;
+      try {
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
+          if (!active) return;
+          if (currentSession || attempt === 4) {
+            applySession(currentSession);
+            return;
+          }
+          await new Promise(resolve => window.setTimeout(resolve, 250));
         }
-
-        await new Promise(resolve => window.setTimeout(resolve, 250));
+      } catch (e) {
+        console.error('Auth init failed:', e);
+      } finally {
+        if (active) setLoading(false);
       }
     };
+
+    // Never leave the app stuck loading after a refresh.
+    const safety = window.setTimeout(() => active && setLoading(false), 4000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!active) return;
@@ -80,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       active = false;
+      window.clearTimeout(safety);
       subscription.unsubscribe();
     };
   }, [applySession]);
