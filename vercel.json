@@ -31,7 +31,7 @@
       "destination": "https://zoeyynbzgmzlgoymsdvy.supabase.co/functions/v1/sitemap?type=rss"
     },
     {
-      "source": "/((?!sitemap|rss).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
